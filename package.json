@@ -1,0 +1,44 @@
+{
+  "name": "omnicomment",
+  "version": "1.0.0",
+  "description": "Browserextension to comment on any webpage powered buy the Blockchain",
+  "main": "server.mjs",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "dev": "nodemon server/src/server.mjs",
+    "dev-node": "cross-env GENERATE_NODE_PORT='true' nodemon /server/src/server.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tquillity/OmniComment.git"
+  },
+  "keywords": [
+    "Blockchain",
+    "Comment"
+  ],
+  "author": "Mikael Sundh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Tquillity/OmniComment/issues"
+  },
+  "homepage": "https://github.com/Tquillity/OmniComment#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "hex-to-binary": "^1.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.4.1",
+    "pubnub": "^8.1.0",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^1.6.0",
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.1.0",
+    "uuid": "^9.0.1",
+    "vitest": "^1.6.0"
+  }
+}

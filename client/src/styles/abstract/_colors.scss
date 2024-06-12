@@ -1,0 +1,46 @@
+// _colors.scss
+
+// ! Remember to decode on colorschemes
+
+// Light theme colors - Default theme
+$light-background-color: #7f7f7f;       
+$light-primary-color: #3498db;          
+$light-secondary-color: lightgreen;          
+$light-button-primary-color: #262626;   
+$light-button-text-color: #d87946;      
+$light-border-color: brown;                
+$light-card-color: lightgrey;            
+$light-font-color: #ffffff;             
+
+// Dark theme colors
+$dark-background-color: black;          
+$dark-primary-color: white;
+$dark-secondary-color: green;
+$dark-button-primary-color: darkorange;
+$dark-button-text-color: black;
+$dark-border-color: darkbrown;
+$dark-card-color: grey;
+$dark-font-color: white;                
+
+// CSS variables defined 
+:root {
+  --background-color: #{$light-background-color};
+  --primary-color: #{$light-primary-color};
+  --secondary-color: #{$light-secondary-color};
+  --button-primary-color: #{$light-button-primary-color};
+  --button-text-color: #{$light-button-text-color};
+  --border-color: #{$light-border-color};
+  --card-color: #{$light-card-color};
+  --font-color: #{$light-font-color};
+}
+
+[data-theme='dark'] {
+  --background-color: #{$dark-background-color};
+  --primary-color: #{$dark-primary-color};
+  --secondary-color: #{$dark-secondary-color};
+  --button-primary-color: #{$dark-button-primary-color};
+  --button-text-color: #{$dark-button-text-color};
+  --border-color: #{$dark-border-color};
+  --card-color: #{$dark-card-color};
+  --font-color: #{$dark-font-color};
+}
