@@ -1,4 +1,5 @@
 import Block from './Block.mjs';
+import { createHash } from '../utilities/crypto-lib.mjs';
 
 export default class Blockchain {
   constructor() {
@@ -15,5 +16,28 @@ export default class Blockchain {
     return newBlock;
   }
 
-  
+
+  static validateChain(chain) {
+    if (JSON.stringify(chain.at(0)) !== JSON.stringify(Block.genesis)) return false;
+
+    for (let i = 1; i < chain.length; i++) {
+      const { timestamp, lastHash, hash, nonce, difficulty, data } = chain.at(i);
+      const currentLastHash = chain[i -1].hash;
+      const lastDifficulty = chain[i - 1].difficulty;
+
+      if (lastHash !== currentLastHash) return false;
+
+      if ( Math.abs(lastDifficulty - difficulty) > 1 ) return false;
+
+      const validHash = createHash(
+        timestamp,
+        lastHash,
+        nonce,
+        difficulty,
+        data
+      );
+      if (hash !== validHash) return false;
+    }
+    return true;
+  } 
 }
