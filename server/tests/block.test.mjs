@@ -2,7 +2,7 @@
 import hexToBinary from 'hex-to-binary';
 import { it, describe, expect, beforeEach } from 'vitest';
 import { createHash } from '../utilities/crypto-lib.mjs';
-import Block from '../models/block.mjs';
+import Block from '../models/Block.mjs';
 import { GENESIS_DATA, MINE_RATE } from '../config/settings.mjs';
 
 describe('Block', () => {
