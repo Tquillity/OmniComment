@@ -3,7 +3,7 @@ import hexToBinary from 'hex-to-binary';
 import { it, describe, expect, beforeEach } from 'vitest';
 import { createHash } from '../utilities/crypto-lib.mjs';
 import Block from '../models/block.mjs';
-import { GENESIS_DATA } from '../config/settings.mjs';
+import { GENESIS_DATA, MINE_RATE } from '../config/settings.mjs';
 
 describe('Block', () => {
   const timestamp = Date.now();
@@ -101,8 +101,25 @@ describe('Block', () => {
     });
   });
 
+  // Tests to verify the adjustDifficultyLevel() function
+  describe('adjustDifficultyLevel() function', () => {
+    it('should raise the difficulty for a quickly mined block', () => {
+      expect(
+        Block.adjustDifficultyLevel({
+          block: block,
+          timestamp: block.timestamp + MINE_RATE - 100,
+        })
+      ).toEqual(block.difficulty + 1);
+    });
 
-
-
+    it('should lower the difficulty level for a slowly mined block', () => {
+      expect(
+        Block.adjustDifficultyLevel({
+          block: block,
+          timestamp: block.timestamp + MINE_RATE + 100,
+        })
+      ).toEqual(block.difficulty - 1);
+    });
+  });
 
 });
