@@ -1,5 +1,9 @@
+
+import hexToBinary from 'hex-to-binary';
 import { it, describe, expect, beforeEach } from 'vitest';
+import { createHash } from '../utilities/crypto-lib.mjs';
 import Block from '../models/block.mjs';
+import { GENESIS_DATA } from '../config/settings.mjs';
 
 describe('Block', () => {
   const timestamp = Date.now();
@@ -18,6 +22,7 @@ describe('Block', () => {
     data: data,
   });
 
+  // Tests to verify that the block object has the expected properties and values
   describe('Properties', () => {
     it('Should have the properties timestamp, lastHash, hash, nonce, difficulty, and data', () => {
       expect(block).toHaveProperty('timestamp');
@@ -38,6 +43,63 @@ describe('Block', () => {
     });
   });
 
+  // Tests to verify the correctnes of the genesis block and its data 
+  describe('Genesis block', () => {
+    const genesisBlock = Block.genesis;
+
+    it('Should return an instance of the Block class', () => {
+      expect(genesisBlock).toBeInstanceOf(Block);
+    });
+
+    it('Should return the genesis data', () => {
+      expect(genesisBlock).toEqual(GENESIS_DATA);
+    });
+  })
+
+  // Tests to verify the properties and correctness of a newly mined block
+  describe('mineBlock() function',() => {
+    let lastBlock, data, minedBlock;
+
+    beforeEach(() => {
+      lastBlock = Block.genesis;
+      data = { message: 'Test Block' };
+      minedBlock = Block.mineBlock({ lastBlock, data });
+    });
+
+    it('Should return an instance of the Block class', () => {
+      expect(minedBlock).toBeInstanceOf(Block);
+    });
+
+    it('Should add a timestamp', () => {
+      expect(minedBlock.timestamp).not.toBeUndefined();
+    });
+
+    it('Should set the lastHash to the hash of the lastBlock hash', () => {
+      expect(minedBlock.lastHash).toEqual(lastBlock.hash);
+    });
+
+    it('Should set the data', () => {
+      expect(minedBlock.data).toEqual(data);
+    });
+
+    it('Should produce a hash that matches the difficulty criteria', () => {
+      expect(
+        hexToBinary(minedBlock.hash).substring(0, minedBlock.difficulty)
+      ).toEqual('0'.repeat(minedBlock.difficulty));
+    });
+
+    it('Should produce a hash based on correct inputMap', () => {
+      expect(minedBlock.hash).toEqual(
+        createHash(
+          minedBlock.timestamp,
+          minedBlock.lastHash,
+          minedBlock.nonce,
+          minedBlock.difficulty,
+          data
+        )
+      );
+    });
+  });
 
 
 
