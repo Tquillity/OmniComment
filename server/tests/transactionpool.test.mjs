@@ -43,6 +43,40 @@ describe('TransactionPool', () => {
     });
   });
 
+  // Test the validTransactions method
+  describe('validTransactions method', () => {
+    let transactions;
+
+    // Before each test, create multiple transactions and add them to the pool
+    beforeEach(() => {
+      transactions = [];
+
+      for (let i = 0; i < 10; i++) {
+        transaction = new Transaction({
+          sender,
+          recipient: 'Mikael',
+          amount: 50,
+        });
+
+        // Introducing invalid transactions
+        if (i % 3 === 0) {
+          transaction.inputMap.amount = 1010;
+        } else if (i % 3 === 1) {
+          transaction.inputMap.signature = new Wallet().sign('no-good');
+        } else { 
+          transactions.push(transaction);
+        }
+
+        transactionPool.addTransaction(transaction);
+      }
+    });
+
+    // Test to ensure only valid transactions are returned
+    it('should return valid transactions', () => {
+      expect(transactionPool.validateTransactions()).toStrictEqual(transactions);
+    });
+  });
+
 
 
 }); // End of TransactionPool test suite

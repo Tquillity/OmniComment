@@ -24,4 +24,13 @@ export default class TransactionPool {
     );
   }
 
+
+  // Method to validate transactions in the pool
+  validateTransactions() {
+    // Filter and return only the valid transactions
+    const validTransactions = Object.values(this.transactionMap).filter(
+      (transaction) => Transaction.validate(transaction)
+    );
+    return validTransactions;
+  }
 }
