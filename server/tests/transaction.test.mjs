@@ -1,5 +1,5 @@
 import { it, describe, expect, beforeEach } from 'vitest';
-import Transactions from '../models/Transaction.mjs';
+import Transaction from '../models/Transaction.mjs';
 import Wallet from '../models/Wallet.mjs';
 import { verifySignature } from '../utilities/crypto-lib.mjs';
 import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
@@ -12,7 +12,7 @@ describe('Transaction', () => {
     sender = new Wallet();
     recipient = 'Mikael';
     amount = 11;
-    transaction = new Transactions({ sender, recipient, amount });
+    transaction = new Transaction({ sender, recipient, amount });
   });
 
   // Describe tests related to the propertie of the transaction
@@ -40,6 +40,70 @@ describe('Transaction', () => {
       expect(transaction.outputMap[sender.publicKey]).toEqual(sender.balance - amount);
     });
   });
+
+  // Describe the tests related to the input map of the transaction
+  describe('inputMap', () => {
+    // Test to check if the transaction has an inputMap property
+    it('should have a property named inputMap', () => {
+      expect(transaction).toHaveProperty('inputMap');
+    });
+
+    // Test to check if the inputMap has a timestamp property
+    it('should have a property named timestamp', () => {
+      expect(transaction.inputMap).toHaveProperty('timestamp');
+    });
+
+    // Test to check if the inputMap sets the amount to the sender's balance
+    it('should set the amount to the sender balance', () => {
+      expect(transaction.inputMap.amount).toEqual(sender.balance);
+    });
+
+    // Test to check if the inputMap sets the address to the sender's public key
+    it('should set the address value to the senders publicKey', () => {
+      expect(transaction.inputMap.address).toEqual(sender.publicKey);
+    });
+
+    // Test to check if the inputMap is signed correctly
+    it('should sign the inputMap', () => {
+      expect(
+        verifySignature({
+          publicKey: sender.publicKey,
+          data: transaction.outputMap,
+          signature: transaction.inputMap.signature,
+        })
+      ).toBe(true);
+    });
+  });
+
+  // describe tests related to transaction validation
+  describe('validate transaction', () => {
+    // Test to check if a valid transaction is correctly validated
+    describe('when the transaction is valid', () => {
+      it('should return true', () => {
+        expect(Transaction.validate(transaction)).toBe(true);
+      });
+    });
+
+    // Test to check if an invalid transactoin is correctly identified
+    describe('when the transaction is invalid', () => {
+      // Test to check if an invalid outputMap is identified
+      describe('and the transaction outputMap value is invalid', () => {
+        it('should return false', () => {
+          transaction.outputMap[sender.publicKey] = 1337;
+          expect(Transaction.validate(transaction)).toBe(false);
+        });
+      });
+
+      // Test to check if an invalid inputMap is identified 
+      describe('and the transaction inputMap signature is invalid', () => {
+        it('should return false', () => {
+          transaction.inputMap.signature = new Wallet().sign('data');
+          expect(Transaction.validate(transaction)).toBe(false);
+        });
+      });
+    });
+  });
+
 
 
 });
