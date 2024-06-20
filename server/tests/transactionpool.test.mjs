@@ -77,6 +77,13 @@ describe('TransactionPool', () => {
     });
   });
 
+  // Test the clearTransactions method
+  describe('clearTransactions()', () => {
+    it('should clear the transactionPool', () => {
+      transactionPool.clearTransactions();
+      expect(transactionPool.transactionMap).toEqual({});
+    });
+  });
 
 
 }); // End of TransactionPool test suite

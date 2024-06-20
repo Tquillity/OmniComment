@@ -12,6 +12,11 @@ export default class TransactionPool {
     this.transactionMap[transaction.id] = transaction;
   }
 
+  // Method to clear all transactions from the pool
+  clearTransactions() {
+    this.transactionsMap = {};
+  }
+
 
   // Method to check if a transaction exists in the pool based on the senders address
   transactionExist({ address }) {
