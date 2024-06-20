@@ -13,6 +13,14 @@ export default class Transaction {
     this.inputMap = inputMap || this.createinputMap({ sender, outputMap: this.outputMap });
   }
 
+  // Static method to create a reward transaction for miners
+  static transactionReward({ miner }) {
+    return new this({
+      inputMap: REWARD_ADDRESS, // Set the inputMap to the reward address
+      outputMap: { [miner.publicKey]: MINING_REWARD }, // Set the outputMap to the miner's public key with the mining reward
+    });
+  }
+
   // Static method to validate a transaction
   static validate(transaction) {
     const {

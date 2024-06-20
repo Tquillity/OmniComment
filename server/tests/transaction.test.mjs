@@ -161,4 +161,24 @@ describe('Transaction', () => {
 
   });  
 
+  // Describe tests related to transaction rewards
+  describe('transaction rewards', () => {
+    let transactionReward, miner;
+
+    // Before each test, initiate a miner wallet and a reward transaction
+    beforeEach(() => {
+      miner = new Wallet();
+      transactionReward = Transaction.transactionReward({ miner });
+    });
+
+    // Test to check if the reward transaction contains the miner's address
+    it('should create a reward transaction with the address of the miner', () => {
+      expect(transactionReward.inputMap).toEqual(REWARD_ADDRESS);
+    });
+
+    //Test to check if hte reward transaction contains the correct mining reward
+    it('should create only ONE reward transaction with the MINING_REWARD', () => {
+      expect(transactionReward.outputMap[miner.publicKey]).toEqual(MINING_REWARD);
+    });
+  });
 });
