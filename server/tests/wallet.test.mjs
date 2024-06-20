@@ -46,7 +46,7 @@ describe('Wallet', () => {
     });
   });
 
-  //Describe tests related to creating transactions
+  // Describe tests related to creating transactions
   describe('create transactions', () => {
     // test to ensure an error is thrown when the amount exceeds the wallet balance
     describe('and the amount is larger than the balance', () => {
@@ -103,6 +103,132 @@ describe('Wallet', () => {
 
           // Restore the original calculateBalance method
           Wallet.calculateBalance = originalCalculateBalance;
+        });
+      });
+    });
+  });
+
+  // Describe tests related to calculating the wallet balance
+  describe('calculate the balance', () => {
+    let blockchain;
+
+    // Before each test initialize a new blockchain
+    beforeEach(() => {
+      blockchain = new Blockchain();
+    });
+
+    // Test to ensure the initial balance is returned when there are no transactions for the wallet
+    describe('and there is no output for the wallet', () => {
+      it('should return the initial balace (starting balance)', () => {
+        expect(
+          Wallet.calculateBalance({
+            chain: blockchain.chain,
+            address: wallet.publicKey,
+          })
+        ).toEqual(INITIAL_BALANCE);
+      });
+    });
+
+    // Test to ensure the balance is calculated correctly when there are transactions for the wallet
+    describe('and there are outputs for the wallet', () => {
+      let transactionOne, transactionTwo;
+
+      // Before each test create transactions and add them to the blockchain
+      beforeEach(() => {
+        transactionOne = new Wallet().createTransaction({
+          recipient: wallet.publicKey,
+          amount: 50,
+        });
+
+        transactionTwo = new Wallet().createTransaction({
+          recipient: wallet.publicKey,
+          amount: 60,
+        });
+
+        blockchain.addBlock({ data: [transactionOne, transactionTwo] });
+      });
+
+      // Test to ensure the balance is calculated as the sum of all transactions for the wallet
+      it('should calculate the sum of all outputs for the wallet', () => {
+        expect(
+          Wallet.calculateBalance({
+            chain: blockchain.chain,
+            address: wallet.publicKey,
+          })
+        ).toEqual(
+          INITIAL_BALANCE +
+            transactionOne.outputMap[wallet.publicKey] +
+            transactionTwo.outputMap[wallet.publicKey]
+        );
+      });
+
+      // Test to ensure the Balance is calculated correctly when the wallet has made a transaction
+      describe('and the wallet has made a transaction', () => {
+        let latestTransaction;
+
+        // Before each test, create a transaction from the wallet and add it to the blockchain
+        beforeEach(() => {
+          latestTransaction = wallet.createTransaction({
+            recipient: 'Angela',
+            amount: 50,
+          });
+
+          blockchain.addBlock({ data: [latestTransaction] });
+        });
+
+        // Test to ensure the balance is calculated as the amount from the latest transaction
+        it('should return the amount from the latest transaction', () => {
+          expect(
+            Wallet.calculateBalance({
+              chain: blockchain.chain,
+              address: wallet.publicKey,
+            })
+          ).toEqual(latestTransaction.outputMap[wallet.publicKey]);
+        });
+
+        // Test to ensure the balance is calculated correctly when there are transactions before and after the latest transaction
+        describe('and there are outputs next and after the recent transaction', () => {
+          let currentBlockTransaction, nextBlockTransaction;
+
+          // Before each test, create additional transactions and add them to the blockchain
+          beforeEach(() => {
+            latestTransaction = wallet.createTransaction({
+              recipient: 'Mikael',
+              amount: 60,
+            });
+
+            // Create a reward transaction
+            currentBlockTransaction = Transaction.transactionReward({
+              miner: wallet,
+            });
+
+            // Add the transactions to a block in the blockchain
+            blockchain.addBlock({
+              data: [latestTransaction, currentBlockTransaction],
+            });
+
+            // Create a new transaction
+            nextBlockTransaction = new Wallet().createTransaction({
+              recipient: wallet.publicKey,
+              amount: 70,
+            });
+
+            blockchain.addBlock({ data: [nextBlockTransaction] });
+          });
+
+          // Test to ensure the balance includes the amounts from the returned balance
+          it('should include the amounts from the returned balance', () => {
+            expect(
+              Wallet.calculateBalance({
+                chain: blockchain.chain,
+                address: wallet.publicKey,
+              })
+            ).toEqual(
+              latestTransaction.outputMap[wallet.publicKey] +
+                currentBlockTransaction.outputMap[wallet.publicKey] +
+                nextBlockTransaction.outputMap[wallet.publicKey]
+            );
+          });
         });
       });
     });

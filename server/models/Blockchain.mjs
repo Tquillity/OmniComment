@@ -1,5 +1,7 @@
-import Block from './Block.mjs';
+import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
 import { createHash } from '../utilities/crypto-lib.mjs';
+import Block from './Block.mjs';
+import Transaction from './Transaction.mjs';
 
 export default class Blockchain {
   constructor() {
