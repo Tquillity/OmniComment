@@ -12,11 +12,29 @@ export default class TransactionPool {
     this.transactionMap[transaction.id] = transaction;
   }
 
+  // Method to clear transactions that are included in a block from the transaction pool
+  clearBlockTransactions({ chain }) {
+    for (let i = 1; i < chain.length; i++) {
+
+      const block = chain[i];
+    
+      for (let transaction of block.data) {
+        if (this.transactionMap[transaction.id]) {
+          delete this.transactionMap[transaction.id];
+        }
+      }
+    }
+  }
+
   // Method to clear all transactions from the pool
   clearTransactions() {
     this.transactionsMap = {};
   }
 
+  // Method to replace the current transaction map with a new one
+  replaceTransactionMap(transactionMap) {
+    this.transactionMap = transactionMap;
+  }
 
   // Method to check if a transaction exists in the pool based on the senders address
   transactionExist({ address }) {
@@ -28,7 +46,6 @@ export default class TransactionPool {
       (transaction) => transaction.inputMap.address === address
     );
   }
-
 
   // Method to validate transactions in the pool
   validateTransactions() {

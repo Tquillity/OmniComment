@@ -85,5 +85,52 @@ describe('TransactionPool', () => {
     });
   });
 
+  // Test the clearBlockTransactions method
+  describe('clearBlockTransactions method', () => {
+    it('should clear the pool of existing blockchain transactions', () => {
+      const blockchain = new Blockchain();
+      const expectedMap = {}; // Map to store expected transactions after clearing
 
-}); // End of TransactionPool test suite
+      // Create fake transactions and add them to the blockchain and transaction pool
+      for (let i = 0; i < 20; i++) {
+        const transaction = new Wallet().createTransaction({
+          recipient: 'Mikael',
+          amount: 7,
+        });
+
+        transactionPool.addTransaction(transaction);
+
+        if (i % 2 === 0) {
+          blockchain.addBlock({ data: [transaction] });
+        } else {
+          expectedMap[transaction.id] = transaction;
+        }
+      }
+
+      // Clear transactions that are already in the blockchain
+      transactionPool.clearBlockTransactions({ chain: blockchain.chain });
+
+      // Check if the transaction pool contains only the expected transactions
+      expect(transactionPool.transactionMap).toEqual(expectedMap);
+    });
+  });
+
+  // Test the replaceTransactionMap method
+  describe('replaceTransactionMap method', () => {
+    it('should replace the transaction map', () => {
+      const newTransactionPool = new TransactionPool();
+      const newTransaction = new Transaction({
+        sender,
+        recipient: 'Angela',
+        amount: 11,
+      });
+      const newTransactionMap = { [newTransaction.id]: newTransaction };
+
+      // Replace the transaction map with the new map
+      newTransactionPool.replaceTransactionMap(newTransactionMap);
+
+      // Check if the transaction map has been replaced
+      expect(newTransactionPool.transactionMap).toEqual(newTransactionMap);
+    });
+  });
+});
