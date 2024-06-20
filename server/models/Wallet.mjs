@@ -8,4 +8,9 @@ export default class Wallet {
     this.keyPair = ellipticHash.genKeyPair();
     this.publicKey = this.keyPair.getPublic().encode('hex');
   }
+
+
+  sign(data) {
+    return this.keyPair.sign(createHash(data));
+  }
 }

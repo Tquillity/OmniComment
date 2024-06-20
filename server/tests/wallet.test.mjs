@@ -21,4 +21,29 @@ describe('Wallet', () => {
       expect(wallet).toHaveProperty('publicKey');
     });
   });
+
+  describe('Signing Process', () => {
+    let data = 'test';
+
+    it('should verify a signature', () => {
+      expect(
+        verifySignature({
+          publicKey: wallet.publicKey,
+          data,
+          signature: wallet.sign(data),
+        })
+      ).toBe(true);
+    });
+
+    it('should not verify an invalid signature', () => {
+      expect(
+        verifySignature({
+          publicKey: wallet.publicKey,
+          data,
+          signature: new Wallet().sign(data),
+        })
+      ).toBe(false);
+    });
+  });
+
 });
