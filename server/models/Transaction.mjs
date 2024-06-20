@@ -37,6 +37,26 @@ export default class Transaction {
 
     return true;
   }
+
+  // Method to update an existing transaction
+  update({ sender, recipient, amount }) {
+    // Check if the sender has enough funds
+    if(amount > this.outputMap[sender.publicKey])
+      throw new Error('Amount exceeds balance');
+
+    // Update the recipient's balance in the outputMap
+    if(!this.outputMap[recipient]) {
+      this.outputMap[recipient] = amount;
+    } else {
+      this.outputMap[recipient] = this.outputMap[recipient] + amount;
+    }
+
+    // Deduct the amount from the sender's balance in the outputMap
+    this.outputMap[sender.publicKey] = this.outputMap[sender.publicKey] - amount;
+
+    // Recreate the inputMap to reflect the updated outputMap
+    this.inputMap = this.createinputMap({ sender, outputMap: this.outputMap });
+  }
   
   createMap({ sender, recipient, amount }) {
     const outputMap = {};

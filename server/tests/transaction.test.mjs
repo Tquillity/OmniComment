@@ -104,6 +104,61 @@ describe('Transaction', () => {
     });
   });
 
+  // Describe tests related to updating a transaction
+  describe('update transaction', () => {
+    let orgSignature, orgSenderOutput, nextRecipient, nextAmount;
 
+    // Test to check if an invalid update (not enough funds) thros an error
+    describe('and the amount is invalid (not enough funds)', () => {
+      it('should throw an error', () => {
+        expect(() => {
+          transaction.update({ sender, recipient, amount: 9999 });
+        }).toThrow('Amount exceeds balance');
+      });
+    });
+
+    // Test to check if a  valid aupdate is handled corectly
+    describe('and the amount is valid', () => {
+      beforeEach(() => {
+        orgSignature = transaction.inputMap.signature;
+        orgSenderOutput = transaction.outputMap[sender.publicKey];
+        nextAmount = 25;
+        nextRecipient = 'Angela';
+
+        transaction.update({
+          sender,
+          recipient: nextRecipient,
+          amount: nextAmount,
+        });
+      });
+
+      // Test to check if the outputMap displaus the amount for the next recipient
+      it('should diplay the amount for the next recipient', () => {
+        expect(transaction.outputMap[nextRecipient]).toEqual(nextAmount);
+      });
+
+      // Test to check if the amount is withdrawn from the original sender's output balance
+      it('should withdraw the amount from the original sender output balance', () => {
+        expect(transaction.outputMap[sender.publicKey]).toEqual(
+          orgSenderOutput - nextAmount
+        );
+      });
+
+      // Test to check if the total output amount matches the input map amount
+      it('should match the total output amount with the input amount', () => {
+        expect(
+          Object.values(transaction.outputMap).reduce(
+            (total, amount) => total + amount
+          )
+        ).toEqual(transaction.inputMap.amount);
+      });
+
+      // Test to check if the transacton creates a new signature
+      it('should create a new signature of the transaction', () => {
+        expect(transaction.inputMap.signature).not.toEqual(orgSignature);
+      });
+    });
+
+  });  
 
 });
