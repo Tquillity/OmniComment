@@ -12,6 +12,16 @@ export default class TransactionPool {
     this.transactionMap[transaction.id] = transaction;
   }
 
-  
+
+  // Method to check if a transaction exists in the pool based on the senders address
+  transactionExist({ address }) {
+    // Convert the transaction Map to an array of transactions
+    const transactions = Object.values(this.transactionMap);
+
+    // Find and return the transaction that matches the sender's address
+    return transactions.find(
+      (transaction) => transaction.inputMap.address === address
+    );
+  }
 
 }
