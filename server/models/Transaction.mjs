@@ -13,6 +13,30 @@ export default class Transaction {
     this.inputMap = inputMap || this.createinputMap({ sender, outputMap: this.outputMap });
   }
 
+  // Static method to validate a transaction
+  static validate(transaction) {
+    const {
+      inputMap: { address, amount, signature},
+      outputMap, 
+    } = transaction;
+
+    // Calculate the total output amount
+    const outputTotal = Object.values(outputMap).reduce(
+      (total, amount) => total + amount
+    );
+
+    // Check if the input amount matched the output amount
+    if (amount !== outputTotal) {
+      return false;
+    }
+
+    // Verify the signature ti ensure the transaction is valid
+    if(!verifySignature({ publicKey: address, data: outputMap, signature})) {
+      return false;
+    }
+
+    return true;
+  }
   
   createMap({ sender, recipient, amount }) {
     const outputMap = {};
