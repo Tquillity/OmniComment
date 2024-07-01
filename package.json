@@ -7,7 +7,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "dev": "nodemon server/server.mjs",
-    "dev-node": "cross-env GENERATE_NODE_PORT='true' nodemon /server/src/server.mjs"
+    "dev-node": "cross-env GENERATE_NODE_PORT='true' nodemon server/server.mjs"
   },
   "repository": {
     "type": "git",

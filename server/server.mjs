@@ -1,12 +1,16 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import path from 'path';
+import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
 import blockRouter from './routes/block-routes.mjs';
 import blockchainRouter from './routes/blockchain-routes.mjs';
 import PubNubServer from './pubnub-server.mjs';
 
 // Load environment variables from config.env
-dotenv.config({ path: './config/config.env' });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, 'config', 'config.env')});
 
 const credentials = {
   publishKey: process.env.PUBLISH_KEY,
