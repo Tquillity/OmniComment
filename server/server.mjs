@@ -3,8 +3,11 @@ import dotenv from 'dotenv';
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
+import TransactionPool from './models/TransactionPool.mjs';
+import Wallet from './models/Wallet.mjs';
 import blockRouter from './routes/block-routes.mjs';
 import blockchainRouter from './routes/blockchain-routes.mjs';
+import transactionRouter from './routes/transaction-routes.mjs';
 import PubNubServer from './pubnub-server.mjs';
 
 // Load environment variables from config.env
@@ -21,8 +24,12 @@ const credentials = {
 
 // Create an instance of Blockchain
 export const blockchain = new Blockchain();
+export const transactionPool = new TransactionPool();
+export const wallet = new Wallet();
 export const pubnubServer = new PubNubServer({
   blockchain: blockchain,
+  transactionPool: transactionPool,
+  wallet: new Wallet(),
   credentials: credentials,
 });
 
@@ -45,7 +52,7 @@ setTimeout(() => {
 // Routes setup for functionalities
 app.use('/api/v1/blockchain', blockchainRouter);
 app.use('/api/v1/block', blockRouter);
-
+app.use('/api/v1/wallet', transactionRouter);
 
 // Function to synchronize the blockchain with the root node
 const synchronize = async () => {
@@ -54,6 +61,12 @@ const synchronize = async () => {
   if (response.ok) {
     const result = await response.json();
     blockchain.replaceChain(result.data); // Replace the current chain with the fetched chain
+  }
+
+  response = await fetch(`${ROOT_NODE}/api/v1/wallet/transactions`);
+  if (response.ok) {
+    const result =  await response.json();
+    transactionPool.replaceTransactionMap(result.data);
   }
 };
 
