@@ -9,6 +9,7 @@ import blockRouter from './routes/block-routes.mjs';
 import blockchainRouter from './routes/blockchain-routes.mjs';
 import transactionRouter from './routes/transaction-routes.mjs';
 import PubNubServer from './pubnub-server.mjs';
+import authRouter from './routes/auth-routes.mjs';
 
 // Load environment variables from config.env
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +39,7 @@ const app = express();
 
 // Middleware to parse JSON data
 app.use(express.json());
+app.use('/api/v1/auth', authRouter);
 
 // Default port ofr the server and Root node URL
 const DEFAULT_PORT = 5001;
