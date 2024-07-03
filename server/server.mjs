@@ -10,11 +10,16 @@ import blockchainRouter from './routes/blockchain-routes.mjs';
 import transactionRouter from './routes/transaction-routes.mjs';
 import PubNubServer from './pubnub-server.mjs';
 import authRouter from './routes/auth-routes.mjs';
+import { errorHandler } from './middleware/errorHandler.mjs';
+import commentRouter from './routes/comments-routes.mjs';
 
 // Load environment variables from config.env
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+global.__appdir = __dirname;
 dotenv.config({ path: path.join(__dirname, 'config', 'config.env')});
+
+
 
 const credentials = {
   publishKey: process.env.PUBLISH_KEY,
@@ -40,6 +45,7 @@ const app = express();
 // Middleware to parse JSON data
 app.use(express.json());
 app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/comments', commentRouter);
 
 // Default port ofr the server and Root node URL
 const DEFAULT_PORT = 5001;
@@ -76,6 +82,8 @@ const synchronize = async () => {
 if (process.env.GENERATE_NODE_PORT === 'true') {
   NODE_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
+
+app.use(errorHandler);
 
 // Set the port to either the dynamically generated port or the default port
 const PORT = NODE_PORT || DEFAULT_PORT;

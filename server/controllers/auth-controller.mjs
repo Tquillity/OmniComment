@@ -1,34 +1,56 @@
-import User from '../models/UserModel.mjs';
-
-
-export const register = (req, res, next) => {
-  
-  const { name, email, password, role } = req.body;
-
-  // Validation
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      success: false,
-      statusCode: 400,
-      message: "Please provide name, email and password",
-    });
-  }
-
-  const user = new User(name, email, password, role ?? 'user');
-
-  res
-    .status(201)
-    .json({ success: true, statusCode: 201, data: user });
+// @desc    Register a user
+// @route   POST /api/v1/auth/register
+// @access  PUBLIC
+export const register = async (req, res, next) => {
+  res.status(201).json({
+    success: true,
+    statusCode: 201,
+    data: 'User has been registered successfully',
+  });
 };
 
-export const login = (req, res, next) => {
-  res
-    .status(201)
-    .json({ success: true, statusCode: 200, message: "User logged in" });
+// @desc    User login
+// @route   POST /api/v1/auth/login
+// @access  PUBLIC
+export const login = async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    data: 'User has been logged in successfully',
+  });
 };
 
-export const getMe = (req, res, next) => {
-  res
-    .status(201)
-    .json({ success: true, statusCode: 200, message: "User info retrieved" });
+// @desc    Returns information on the logged in user
+// @route   GET /api/v1/auth/me
+// @access  PRIVATE
+export const getMe = async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    data: 'Show user profile for logged in user',
+  });
 };
+
+// @desc    Forgot password
+// @route   GET /api/v1/auth/forgotpassword
+// @access  PUBLIC
+export const forgotPassword = async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    statusCode: 201,
+    data: 'Forgot password functionality works',
+  });
+};
+
+// @desc    Reset password
+// @route   PUT /api/v1/auth/resetpassword/:token
+// @access  PUBLIC
+export const resetPassword = async (req, res, next) => {
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    data: 'Reset password functionality works',
+  });
+};
+
+const createAndSendToken = (id, statusCode, res) => {};
