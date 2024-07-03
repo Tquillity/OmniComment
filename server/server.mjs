@@ -88,7 +88,7 @@ const synchronize = async () => {
 if (process.env.GENERATE_NODE_PORT === 'true') {
   NODE_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
-
+// Error handling middleware at the end to happen last
 app.use(errorHandler);
 
 // Set the port to either the dynamically generated port or the default port

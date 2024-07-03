@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -33,5 +35,24 @@ const userSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+// Create middleware for mongoose to hash the password before saving it to the database
+userSchema.pre('save', async function (next) {
+  if(!this.isModified('password')) {
+    next();
+  }
+  this.password = await bcrypt.hash(this.password, 12);
+});
+
+// Method useable on schema instances
+userSchema.methods.validatePassword = async function (passwordToCheck) {
+  return await bcrypt.compare(passwordToCheck, this.password);
+};
+
+userSchema.methods.generateToken = function () {
+  return jwt.sign({ id:this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+}
 
 export default mongoose.model('User', userSchema);

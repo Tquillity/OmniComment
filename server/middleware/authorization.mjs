@@ -1,7 +1,9 @@
 import jwt from 'jsonwebtoken';
+import User from '../models/UserModel.mjs';
+import { asyncHandler } from './asyncHandler.mjs';
+import ErrorResponse from '../models/ErrorResponseModel.mjs';
 
-
-export const protect = async (req, res, next) => {
+export const protect = asyncHandler(async (req, res, next) => {
   let token;
 
   if (
@@ -16,24 +18,19 @@ export const protect = async (req, res, next) => {
   // }
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, statusCode: 401, message: 'Not authorized to access this route' });
+    next(new ErrorResponse('Not authorized to access this route', 401));
   }
-  
-  try {
-    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const users = await readFileAsync('data', 'users.json');
 
-    req.user = users.find((u) => u.id === decodedToken.id);
-  } catch (error) {
-    return res
-      .status(401)
-      .json({ success: false, statusCode: 401, message: error.message });
+  // Verify token fetched from the header
+  const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+  req.user = await User.findById(decodedToken.id); // Looking for the user in the Mongo database
+
+  if(!req.user) {
+    next(new ErrorResponse('Not authorized to access this route', 401));
   }
 
   next();
-};
+});
 
 // authorize('admin', 'manager', 'user')
 export const authorize = (...roles) => {
