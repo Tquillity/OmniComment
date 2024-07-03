@@ -39,7 +39,7 @@ export const authorize = (...roles) => {
       return res.status(403).json({
         success: false,
         statusCode: 403,
-        message: `User role ${req.user.role} is not authorized to access this route`
+        message: `User role ${req.user.role} is not authorized to access this route`,
       });
     }
     next();
