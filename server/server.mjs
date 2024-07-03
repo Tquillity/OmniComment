@@ -95,7 +95,7 @@ app.use(errorHandler);
 const PORT = NODE_PORT || DEFAULT_PORT;
 
 // Start the Express server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`Server running on port: ${PORT}`.green.bgBlack);
 
   // If the port is not the default port, synchronize the blockchain
@@ -103,3 +103,9 @@ app.listen(PORT, () => {
     synchronize();
   }
 });
+
+// Handle unhandled rejections
+process.on('unhandledRejection', (err, promise) => {
+  console.log(`Error: ${err.message}`.red);
+  server.close(() => process.exit(1));
+})
