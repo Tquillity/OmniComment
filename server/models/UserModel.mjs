@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -29,7 +30,7 @@ const userSchema = new mongoose.Schema({
     select: false, // This field will not be returned in the response
   },
   resetPasswordToken: String,
-  resetPasswordExpire: Date,
+  resetPasswordTokenExpire: Date,
   createdAt: {
     type: Date,
     default: Date.now,
@@ -55,4 +56,15 @@ userSchema.methods.generateToken = function () {
   });
 }
 
+userSchema.methods.createResetPasswordToken = function () {
+  const resetToken = crypto.randomBytes(20).toString('hex');
+  this.resetPasswordToken = crypto
+  .createHash('sha256')
+  .update(resetToken)
+  .digest('hex');
+  
+  this.resetPasswordTokenExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes 
+
+  return this.resetPasswordToken;
+};
 export default mongoose.model('User', userSchema);
