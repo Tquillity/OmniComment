@@ -1,5 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { connectDb } from './config/mongo.mjs';
+import colors from 'colors';
+import morgan from 'morgan';
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -19,6 +22,8 @@ const __dirname = path.dirname(__filename);
 global.__appdir = __dirname;
 dotenv.config({ path: path.join(__dirname, 'config', 'config.env')});
 
+// Connect to MongoDB
+connectDb();
 
 
 const credentials = {
@@ -44,6 +49,7 @@ const app = express();
 
 // Middleware to parse JSON data
 app.use(express.json());
+app.use(morgan('dev'));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/comments', commentRouter);
 
@@ -90,7 +96,7 @@ const PORT = NODE_PORT || DEFAULT_PORT;
 
 // Start the Express server
 app.listen(PORT, () => {
-  console.log(`Server running on port: ${PORT}`);
+  console.log(`Server running on port: ${PORT}`.green.bgBlack);
 
   // If the port is not the default port, synchronize the blockchain
   if (PORT !== DEFAULT_PORT) {

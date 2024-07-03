@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { readFileAsync } from '../utilities/fileHandler.mjs';
+
 
 export const protect = async (req, res, next) => {
   let token;
