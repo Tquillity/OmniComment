@@ -53,8 +53,8 @@ export const getComments = asyncHandler(async(req, res, next) => {
   let query;
   let queryString;
   let reqQuery = { ...req.query };
-
   const excludeFields = ['select', 'sort', 'page', 'pageSize']; // Exclude these fields from the request query
+
   excludeFields.forEach(field => delete reqQuery[field]);
 
   queryString = JSON.stringify(reqQuery).replace(
@@ -96,9 +96,9 @@ pagination.totalDocuments = pages;
 pagination.totalPages = Math.ceil(pages / pageSize);
 
   // Are there more pages?
-  if (page * pageSize < pages) {
+  if (page * pageSize < pages && pageSize < pages) {
     pagination.next = {
-      page: page +1,
+      page: pageNo + 1,
       pageSize,
     };
   }
@@ -124,7 +124,7 @@ pagination.totalPages = Math.ceil(pages / pageSize);
 // @route PUT /api/v1/comments/
 // @access  PRIVATE
 export const updateComment = asyncHandler(async(req, res, next) => {
-  await Comment.findByIdAndUpdate(req.params.id, req.body);
+  await Comment.findByIdAndUpdate(req.params.id, req.body);s
 
   res.status(204).send();
 });
