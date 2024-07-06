@@ -67,6 +67,22 @@ app.use(mongoSanitize());
 // Set security HTTP headers
 app.use(helmet());
 
+// Apply CSP only to index.html
+app.use((req, res, next) => {
+  if (req.url.startsWith('/api-docs.html')) {
+   helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+    },
+   })(req, res, next);
+  } else {
+    next();
+  }
+});
+
 // Data sanitization against XSS
 app.use(xss());
 
@@ -86,10 +102,18 @@ app.use(hpp());
 
 // ! End of Security - Middleware consider lifting out to a separate file
 
+// Serve static files
+app.use(express.static(path.join(__appdir, 'public')));
+
 // Endpoint definitions
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/users', usersRouter);
+
+// Serve the API documentation
+app.get('/api-docs.html', (req, res) => {
+  res.sendFile(path.join(__appdir, 'public', 'api-docs.html'));
+});
 
 // Default port ofr the server and Root node URL
 const DEFAULT_PORT = 5001;
