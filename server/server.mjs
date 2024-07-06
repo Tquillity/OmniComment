@@ -3,7 +3,8 @@ import dotenv from 'dotenv';
 import { connectDb } from './config/mongo.mjs';
 import colors from 'colors';
 import morgan from 'morgan';
-import mongoSanitize from 'express-mongo-sanitize';
+import mongoSanitize from 'express-mongo-sanitize'; // Data sanitization against NoSQL query injection
+import helmet from 'helmet'; // Set security HTTP headers
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -57,6 +58,9 @@ app.use(express.json());
 
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
+
+// Set security HTTP headers
+app.use(helmet());
 
 // Endpoint definitions
 app.use('/api/v1/auth', authRouter);
