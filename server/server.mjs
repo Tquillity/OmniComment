@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import mongoSanitize from 'express-mongo-sanitize'; // Data sanitization against NoSQL query injection
 import helmet from 'helmet'; // Set security HTTP headers
 import xss from 'xss-clean'; // Data sanitization against XSS
+import rateLimit from 'express-rate-limit'; // Limit request from the same API
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -65,6 +66,14 @@ app.use(helmet());
 
 // Data sanitization against XSS
 app.use(xss());
+
+// Limit request during a specific time frame
+const limit = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+});
+
+app.use(limit);
 
 // Endpoint definitions
 app.use('/api/v1/auth', authRouter);
