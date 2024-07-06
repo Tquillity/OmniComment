@@ -8,6 +8,7 @@ import helmet from 'helmet'; // Set security HTTP headers
 import xss from 'xss-clean'; // Data sanitization against XSS
 import rateLimit from 'express-rate-limit'; // Limit request from the same API
 import hpp from 'hpp'; // HTTP Parameter Pollution attacks
+import cors from 'cors'; // Enable CORS
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -76,6 +77,9 @@ const limit = rateLimit({
 });
 
 app.use(limit);
+
+// Enable CORS
+app.use(cors());
 
 // Prevent HTTP Parameter Pollution attacks
 app.use(hpp());
