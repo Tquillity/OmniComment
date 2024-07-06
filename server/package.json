@@ -29,6 +29,7 @@
     "dotenv": "^16.4.5",
     "elliptic": "^6.5.5",
     "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
     "hex-to-binary": "^1.0.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.4.1",

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { connectDb } from './config/mongo.mjs';
 import colors from 'colors';
 import morgan from 'morgan';
+import mongoSanitize from 'express-mongo-sanitize';
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -48,9 +49,16 @@ export const pubnubServer = new PubNubServer({
 // Initialize an Express application
 const app = express();
 
-// Middleware to parse JSON data
-app.use(express.json());
+// Middleware...
 app.use(morgan('dev'));
+
+// Body parser...
+app.use(express.json());
+
+// Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// Endpoint definitions
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/comments', commentRouter);
 app.use('/api/v1/users', usersRouter);
