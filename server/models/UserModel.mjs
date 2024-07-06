@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'manager'],
+    enum: ['user', 'manager', 'admin'],
     default: 'user',
   },
   password: {
@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  comment: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Comment',
+  }
 });
 
 // Create middleware for mongoose to hash the password before saving it to the database

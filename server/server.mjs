@@ -15,6 +15,7 @@ import PubNubServer from './pubnub-server.mjs';
 import authRouter from './routes/auth-routes.mjs';
 import { errorHandler } from './middleware/errorHandler.mjs';
 import commentRouter from './routes/comments-routes.mjs';
+import usersRouter from './routes/user-routes.mjs';
 
 // Load environment variables from config.env
 const __filename = fileURLToPath(import.meta.url);
@@ -52,6 +53,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/comments', commentRouter);
+app.use('/api/v1/users', usersRouter);
 
 // Default port ofr the server and Root node URL
 const DEFAULT_PORT = 5001;

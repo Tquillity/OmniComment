@@ -7,7 +7,6 @@ import {
   updateComment,
 } from '../controllers/comments-controller.mjs';
 
-
 const router = express.Router();
 
 router.post('/', addComment);

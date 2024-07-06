@@ -1,0 +1,82 @@
+[
+  {
+    "commentNumber": 111222,
+    "title": "Bananas are more yellow than apples",
+    "subject": "I really do believe that Bananas in general are more yellow than apples",
+    "userName": "BananaWoman",
+    "sourceAddress": "www.fruitsandberries.com",
+    "commentVibes": "Positive"
+  },
+  {
+    "commentNumber": 111223,
+    "title": "Apples vs Bananas",
+    "subject": "Apples are crunchy and juicy, but bananas have a more consistent texture.",
+    "userName": "FruitLover",
+    "sourceAddress": "www.fruitdiscussion.com",
+    "commentVibes": "neutral"
+  },
+  {
+    "commentNumber": 111224,
+    "title": "Health Benefits of Bananas",
+    "subject": "Bananas are rich in potassium and help in maintaining heart health.",
+    "userName": "HealthGuru",
+    "sourceAddress": "www.healthtips.com",
+    "commentVibes": "Positive"
+  },
+  {
+    "commentNumber": 111225,
+    "title": "Banana Recipes",
+    "subject": "Here are some great recipes to make delicious desserts using bananas.",
+    "userName": "ChefJohn",
+    "sourceAddress": "www.recipes.com",
+    "commentVibes": "Massively positive"
+  },
+  {
+    "commentNumber": 111226,
+    "title": "Apple Varieties",
+    "subject": "There are so many varieties of apples, each with unique flavors and textures.",
+    "userName": "AppleFan",
+    "sourceAddress": "www.applevarieties.com",
+    "commentVibes": "neutral"
+  },
+  {
+    "commentNumber": 111227,
+    "title": "Bananas vs Apples: A Nutritional Comparison",
+    "subject": "While both fruits are healthy, bananas offer more potassium while apples have more fiber.",
+    "userName": "Nutritionist",
+    "sourceAddress": "www.nutritionfacts.com",
+    "commentVibes": "Positive"
+  },
+  {
+    "commentNumber": 111228,
+    "title": "Favorite Fruit Poll",
+    "subject": "What's your favorite fruit? I personally prefer bananas over apples.",
+    "userName": "BananaWoman",
+    "sourceAddress": "www.fruitsandberries.com",
+    "commentVibes": "Massively positive"
+  },
+  {
+    "commentNumber": 111229,
+    "title": "Banana Smoothie Recipes",
+    "subject": "Bananas make a great base for smoothies. Here are some of my favorite recipes.",
+    "userName": "SmoothieKing",
+    "sourceAddress": "www.smoothierecipes.com",
+    "commentVibes": "Positive"
+  },
+  {
+    "commentNumber": 111230,
+    "title": "How to Store Bananas",
+    "subject": "Bananas should be stored at room temperature. Refrigeration can cause them to turn brown.",
+    "userName": "StorageExpert",
+    "sourceAddress": "www.fruitsandberries.com",
+    "commentVibes": "neutral"
+  },
+  {
+    "commentNumber": 111231,
+    "title": "Apples: A Versatile Fruit",
+    "subject": "Apples can be used in so many dishes, from salads to pies.",
+    "userName": "CulinaryExpert",
+    "sourceAddress": "www.culinaryadvice.com",
+    "commentVibes": "Positive"
+  }
+];
