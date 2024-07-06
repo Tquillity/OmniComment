@@ -5,6 +5,7 @@ import colors from 'colors';
 import morgan from 'morgan';
 import mongoSanitize from 'express-mongo-sanitize'; // Data sanitization against NoSQL query injection
 import helmet from 'helmet'; // Set security HTTP headers
+import xss from 'xss-clean'; // Data sanitization against XSS
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -61,6 +62,9 @@ app.use(mongoSanitize());
 
 // Set security HTTP headers
 app.use(helmet());
+
+// Data sanitization against XSS
+app.use(xss());
 
 // Endpoint definitions
 app.use('/api/v1/auth', authRouter);
