@@ -7,6 +7,7 @@ import mongoSanitize from 'express-mongo-sanitize'; // Data sanitization against
 import helmet from 'helmet'; // Set security HTTP headers
 import xss from 'xss-clean'; // Data sanitization against XSS
 import rateLimit from 'express-rate-limit'; // Limit request from the same API
+import hpp from 'hpp'; // HTTP Parameter Pollution attacks
 import path from 'path';
 import  { fileURLToPath } from 'url';
 import Blockchain from './models/Blockchain.mjs';
@@ -58,6 +59,7 @@ app.use(morgan('dev'));
 // Body parser...
 app.use(express.json());
 
+// ! Security Middleware - Middleware consider lifting out to a separate file
 // Data sanitization against NoSQL query injection
 app.use(mongoSanitize());
 
@@ -74,6 +76,11 @@ const limit = rateLimit({
 });
 
 app.use(limit);
+
+// Prevent HTTP Parameter Pollution attacks
+app.use(hpp());
+
+// ! End of Security - Middleware consider lifting out to a separate file
 
 // Endpoint definitions
 app.use('/api/v1/auth', authRouter);
