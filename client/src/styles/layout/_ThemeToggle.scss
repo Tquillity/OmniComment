@@ -1,0 +1,68 @@
+.theme-toggle {
+  position: relative;
+  margin-right: pxToRem(20);
+}
+
+.theme-toggle-checkbox {
+  display: none;
+}
+
+.theme-toggle-label {
+  display: inline-block;
+  width: pxToRem(50);
+  height: pxToRem(25);
+  background-color: var(--background-color);
+  border-radius: pxToRem(25);
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: pxToRem(2) solid var(--secondary-color);
+}
+
+.theme-toggle-label::before,
+.theme-toggle-label::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: pxToRem(16);
+  transition: z-index 0.3s, left 0.3s;
+}
+
+.theme-toggle-label::before {
+  content: '☀️';
+  left: pxToRem(5);
+  
+}
+
+.theme-toggle-label::after {
+  content: '🌙';
+  left: pxToRem(30);
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label::after {
+  z-index: -2; 
+}
+
+.theme-toggle-inner {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: pxToRem(25);
+  transition: background-color 0.3s;
+}
+
+.theme-toggle-switch {
+  display: block;
+  width: pxToRem(19);
+  height: pxToRem(19);
+  background-color: grey;
+  border-radius: 50%;
+  position: absolute;
+  top: pxToRem(3);
+  left: pxToRem(2);
+  transition: transform 0.3s;
+}
+
+.theme-toggle-checkbox:checked + .theme-toggle-label .theme-toggle-switch {
+  transform: translateX(pxToRem(25));
+}

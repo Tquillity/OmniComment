@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import ThemeToggle from './Layout/Themes/ThemeToggle.jsx';
 
 const Header = () => {
   return (
@@ -26,6 +27,7 @@ const Header = () => {
           </li>
         </ul>
       </nav>
+      <ThemeToggle />
     </header>
   );
 }
