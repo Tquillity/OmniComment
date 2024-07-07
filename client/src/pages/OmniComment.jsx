@@ -148,9 +148,9 @@ const OmniComment = ({ auth }) => {
   };
 
   return (
-    <div>
+    <div className="forum-container">
       <h1>Forum</h1>
-      <div>
+      <div className="create-topic">
         <h2>Create a New Topic</h2>
         <form onSubmit={onSubmitTopic}>
           <div>
@@ -165,7 +165,7 @@ const OmniComment = ({ auth }) => {
         </form>
       </div>
 
-      <div>
+      <div className="topics-list">
         <h2>Topics</h2>
         <ul>
           {topics.map((topic) => (
@@ -177,11 +177,10 @@ const OmniComment = ({ auth }) => {
       </div>
 
       {selectedTopic && (
-        <div>
+        <div className="selected-topic">
           <h2>{selectedTopic.title}</h2>
           <p>{selectedTopic.subject}</p>
           <h3>Comments</h3>
-          {/* Fetch and display comments related to the selected topic */}
           <ul>
             {topics
               .filter((t) => t.title === selectedTopic.title)

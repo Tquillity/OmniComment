@@ -1,0 +1,155 @@
+.forum-container {
+  max-width: pxToRem(800);
+  margin: 0 auto;
+  padding: pxToRem(20);
+  background-color: var(--background-color);
+  border-radius: pxToRem(8);
+  box-shadow: 0 0 pxToRem(10) rgba(0, 0, 0, 0.1);
+  color: var(--font-color);
+}
+
+h1 {
+  text-align: center;
+  color: var(--primary-color);
+}
+
+.create-topic,
+.topics-list,
+.selected-topic {
+  margin-bottom: pxToRem(20);
+}
+
+.create-topic {
+  padding: pxToRem(20);
+  background-color: var(--card-color);
+  border-radius: pxToRem(8);
+  box-shadow: 0 0 pxToRem(10) rgba(0, 0, 0, 0.1);
+}
+
+.create-topic h2 {
+  margin-bottom: pxToRem(10);
+  color: var(--secondary-color);
+}
+
+.create-topic form {
+  display: flex;
+  flex-direction: column;
+}
+
+.create-topic label {
+  margin-bottom: pxToRem(5);
+  color: var(--font-color);
+}
+
+.create-topic input,
+.create-topic textarea {
+  margin-bottom: pxToRem(10);
+  padding: pxToRem(10);
+  border: 1px solid var(--border-color);
+  border-radius: pxToRem(4);
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+.create-topic button {
+  align-self: flex-end;
+  padding: pxToRem(10) pxToRem(20);
+  background-color: var(--button-primary-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: pxToRem(4);
+  cursor: pointer;
+}
+
+.create-topic button:hover {
+  filter: brightness(90%);
+}
+
+.topics-list h2 {
+  margin-bottom: pxToRem(10);
+  color: var(--secondary-color);
+}
+
+.topics-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.topics-list li {
+  padding: pxToRem(10);
+  background-color: var(--card-color);
+  border: 1px solid var(--border-color);
+  border-radius: pxToRem(4);
+  margin-bottom: pxToRem(10);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.topics-list li:hover {
+  filter: brightness(110%);
+}
+
+.selected-topic {
+  padding: pxToRem(20);
+  background-color: var(--card-color);
+  border-radius: pxToRem(8);
+  box-shadow: 0 0 pxToRem(10) rgba(0, 0, 0, 0.1);
+}
+
+.selected-topic h2 {
+  margin-bottom: pxToRem(10);
+  color: var(--secondary-color);
+}
+
+.selected-topic p {
+  margin-bottom: pxToRem(20);
+  color: var(--font-color);
+}
+
+.selected-topic h3 {
+  margin-bottom: pxToRem(10);
+  color: var(--secondary-color);
+}
+
+.selected-topic ul {
+  list-style: none;
+  padding: 0;
+  margin-bottom: pxToRem(20);
+}
+
+.selected-topic li {
+  padding: pxToRem(10);
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: pxToRem(4);
+  margin-bottom: pxToRem(10);
+  color: var(--font-color);
+}
+
+.selected-topic form {
+  display: flex;
+  flex-direction: column;
+}
+
+.selected-topic textarea {
+  margin-bottom: pxToRem(10);
+  padding: pxToRem(10);
+  border: 1px solid var(--border-color);
+  border-radius: pxToRem(4);
+  background-color: var(--background-color);
+  color: var(--font-color);
+}
+
+.selected-topic button {
+  align-self: flex-end;
+  padding: pxToRem(10) pxToRem(20);
+  background-color: var(--button-primary-color);
+  color: var(--button-text-color);
+  border: none;
+  border-radius: pxToRem(4);
+  cursor: pointer;
+}
+
+.selected-topic button:hover {
+  filter: brightness(90%);
+}
