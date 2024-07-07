@@ -32,7 +32,6 @@ dotenv.config({ path: path.join(__dirname, 'config', 'config.env')});
 // Connect to MongoDB
 connectDb();
 
-
 const credentials = {
   publishKey: process.env.PUBLISH_KEY,
   subscribeKey: process.env.SUBSCRIBE_KEY,
@@ -115,7 +114,7 @@ app.get('/api-docs.html', (req, res) => {
   res.sendFile(path.join(__appdir, 'public', 'api-docs.html'));
 });
 
-// Default port ofr the server and Root node URL
+// Default port for the server and Root node URL
 const DEFAULT_PORT = 5001;
 const ROOT_NODE = `http://localhost:${DEFAULT_PORT}`;
 
@@ -170,4 +169,4 @@ const server = app.listen(PORT, () => {
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`.red);
   server.close(() => process.exit(1));
-})
+});
