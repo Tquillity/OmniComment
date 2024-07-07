@@ -8,7 +8,7 @@ import Wallet from "../models/Wallet.mjs";
 export const addTransaction = (req, res, next) => {
   const { amount, recipient } = req.body;
 
-  let transaction = transactionPool.transactionExists({
+  let transaction = transactionPool.transactionExist({
     address: wallet.publicKey,
   });
 
