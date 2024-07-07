@@ -1,0 +1,56 @@
+.blockchain-page {
+  padding: pxToRem(20);
+
+  h1 {
+    margin-bottom: pxToRem(20);
+  }
+
+  .block {
+    background-color: var(--card-color);
+    border-radius: pxToRem(5);
+    padding: pxToRem(15);
+    margin-bottom: pxToRem(15);
+
+    h3 {
+      margin-bottom: pxToRem(10);
+    }
+
+    p {
+      margin: pxToRem(5) 0;
+    }
+  }
+}
+
+.react-tabs {
+  &__tab-list {
+    border-bottom: pxToRem(1) solid ;
+    margin: 0 0 pxToRem(10);
+    padding: 0;
+  }
+
+  &__tab {
+    display: inline-block;
+    border: pxToRem(1) solid transparent;
+    border-bottom: none;
+    bottom: pxToRem(-1);
+    position: relative;
+    list-style: none;
+    padding: pxToRem(6) pxToRem(12);
+    cursor: pointer;
+
+    &--selected {
+      background: var(--secondary-color);
+      border-color: var(--border-color);
+      color: var(--font-color);
+      border-radius: pxToRem(5) pxToRem(5) 0 0;
+    }
+  }
+
+  &__tab-panel {
+    display: none;
+
+    &--selected {
+      display: block;
+    }
+  }
+}
