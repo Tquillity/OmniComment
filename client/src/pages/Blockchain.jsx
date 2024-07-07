@@ -8,6 +8,7 @@ const Blockchain = () => {
   const [blockchainData, setBlockchainData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [miningStatus, setMiningStatus] = useState('');
 
   useEffect(() => {
     fetchBlockchainData();
@@ -30,6 +31,22 @@ const Blockchain = () => {
     }
   };
 
+  const mineBlock = async () => {
+    setMiningStatus('Mining block...');
+    try {
+      const response = await axios.post('http://localhost:5001/api/v1/block/mine');
+      if (response.data.success) {
+        setMiningStatus('Block mined successfully');
+        fetchBlockchainData();
+      } else {
+        setMiningStatus('Failed to mine Block.');
+      }
+    } catch (err) {
+      console.error('Error mining block', err);
+      setMiningStatus('Error mining block');
+    }
+  };
+
   const renderBlockchainData = () => {
     if (loading) return <p>Loading blockchain data...</p>;
     if (error) return <p>{error}</p>;
@@ -39,7 +56,7 @@ const Blockchain = () => {
       <div key={index} className="block">
         <h3>Block {index}</h3>
         <p>Hash: {block.hash}</p>
-        <p>Previous Hash: {block.previousHash}</p>
+        <p>Previous Hash: {block.lastHash}</p>
         <p>Timestamp: {new Date(block.timestamp).toLocaleString()}</p>
         <p>Nonce: {block.nonce}</p>
         <p>Difficulty: {block.difficulty}</p>
@@ -67,7 +84,8 @@ const Blockchain = () => {
           </TabPanel>
           <TabPanel>
             <h2>Mine Block</h2>
-            <button>Mine Block</button>
+            <button onClick={mineBlock}>Mine Block</button>
+            <p>{miningStatus}</p>
           </TabPanel>
           <TabPanel>
             <h2>More Features Coming Soon</h2>

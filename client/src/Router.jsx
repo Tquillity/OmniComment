@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 import Layout from './pages/routes/Layout';
 import NotFound from './pages/routes/NotFound';
 import Home from './pages/Home';
