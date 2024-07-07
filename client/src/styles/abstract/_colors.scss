@@ -1,16 +1,14 @@
 // _colors.scss
 
-// ! Remember to decode on colorschemes
-
 // Light theme colors - Default theme
-$light-background-color: #7f7f7f;       
+$light-background-color: white;       
 $light-primary-color: #3498db;          
-$light-secondary-color: lightgreen;          
+$light-secondary-color: green;          
 $light-button-primary-color: #262626;   
 $light-button-text-color: #d87946;      
 $light-border-color: brown;                
-$light-card-color: lightgrey;            
-$light-font-color: #ffffff;             
+$light-card-color: grey;            
+$light-font-color: black;             
 
 // Dark theme colors
 $dark-background-color: black;          

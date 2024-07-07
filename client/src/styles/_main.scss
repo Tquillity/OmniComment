@@ -1,0 +1,31 @@
+// base.scss
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: var(--background-color);
+  color: var(--font-color);
+  line-height: 1.5;
+  width: $pageWidthDesk;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0 pxToRem(16);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-bottom: pxToRem(8);
+}
+
+a {
+  color: var(--secondary-color);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+p {
+  margin-bottom: pxToRem(16);
+}

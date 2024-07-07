@@ -7,8 +7,8 @@
   justify-content: center;
   height: 100vh;
   text-align: center;
-  background-color: #f8f9fa;
-  color: #343a40;
+  background-color: var(--background-color);
+  color: var(--font-color);
 
   h1 {
     font-size: 3rem;
