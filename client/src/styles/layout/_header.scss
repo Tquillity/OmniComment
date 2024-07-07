@@ -1,0 +1,21 @@
+// Header.scss
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: pxToRem(10), pxToRem(20);
+  background-color: var(--primary-color);
+  color: var(--font-color);
+}
+
+.logo {
+  height: pxToRem(80);
+}
+
+nav ul {
+ display: flex;
+
+  li {
+    margin-right: pxToRem(20);
+  }
+}

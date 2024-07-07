@@ -1,11 +1,11 @@
 # Cryptocurrency Blockchain Project Checklist
 
 ## Core Blockchain Functionality
-- [90%] Implement a complete blockchain for a custom cryptocurrency
-- [90%] Create a transaction pool to manage pending transactions
-- [90%] Implement transaction handling and validation
-- [90%] Create a "reward transaction" when a block is mined
-- [90%] Validate transactions according to rules discussed in class
+- [90%] Implement a complete blockchain for a custom cryptocurrency *Make sure it works in the application not only in Postman*
+- [90%] Create a transaction pool to manage pending transactions *Make sure it works in the application not only in Postman*
+- [90%] Implement transaction handling and validation *Make sure it works in the application not only in Postman*
+- [90%] Create a "reward transaction" when a block is mined *Make sure it works in the application not only in Postman*
+- [90%] Validate transactions according to rules discussed in class *Make sure it works in the application not only in Postman*
 
 ## Networking
 - [90%] Enable multiple nodes to run the blockchain *Make sure it works in the application not only in Postman*
