@@ -13,23 +13,23 @@
   - [90%] On startup of a new node *Make sure it works in the application not only in Postman*
   - [90%] When adding transactions *Make sure it works in the application not only in Postman*
   - [90%] When a new block is created *Make sure it works in the application not only in Postman*
-- [50%] Use Redis, PubNub, or WebSockets for network communication *Make sure it works in the application not only in Postman*
+- [100%] Use Redis, _PubNub_, or WebSockets for network communication [VERIFIED_COMPLETE]
 
 ## Database
 - [0%] Store blockchain, blocks, and transactions in MongoDB
 
 ## Security
-- [80%] Implement user registration and login system *Make sure it works in the application not only in Postman*
+- [100%] Implement user registration and login system [VERIFIED_COMPLETE]
 - [80%] Use JSON Web Tokens (JWT) for authentication *Make sure it works in the application not only in Postman*
 - [80%] Implement role-based access control for creating transactions and listing personal transactions/blocks *Make sure it works in the application not only in Postman*
-- [80%] Store user information in MongoDB *Make sure it works in the application not only in Postman/Compass*
+- [100%] Store user information in MongoDB [VERIFIED_COMPLETE]
 
 ## Client Application
 - [5%] Develop a client using React with Vite or vanilla JavaScript with HTML and CSS
 - [0%] Implement functionality to create new transactions
 - [0%] Create a feature to list transactions
-- [0%] Implement a feature to list blocks
-- [0%] Add ability to mine new blocks with transactions
+- [80%] Implement a feature to list blocks *Some Blockchain Bugs*
+- [80%] Add ability to mine new blocks with transactions *Some Blockchain Bugs*
 
 ## VG Requirements
 - [95%] Implement Test-Driven Development (TDD) for transaction handling *Mostly done, go through for repitition*

@@ -9,9 +9,11 @@ const Blockchain = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [miningStatus, setMiningStatus] = useState('');
+  const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     fetchBlockchainData();
+    fetchTransactions();
   },[]);
 
   const fetchBlockchainData = async () => {
@@ -28,6 +30,20 @@ const Blockchain = () => {
       console.error('Error fetching blockchain data', err);
       setError('Error fetching blockchain data');
       setLoading(false);
+    }
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/v1/wallet/transactions');
+      if (response.data.success) {
+        setTransactions(Object.values(response.data.data));
+      } else {
+        setError('Failed to fetch transactions');
+      }
+    } catch (err) {
+      console.error('Error fetching transactions', err);
+      setError('Error fetching transactions');
     }
   };
 
@@ -68,6 +84,30 @@ const Blockchain = () => {
     ));
   };
 
+  const renderTransactions = () => {
+    if (transactions.length === 0) return <p>No transactions found</p>;
+
+    return transactions.map((transaction, index) => (
+      <div key={index} className="transaction">
+      <h3>Transaction {index}</h3>
+      <p>ID: {transaction.id}</p>
+      <p>From: {transaction.inputMap.address}</p>
+      <div>
+        <h4>Recipients:</h4>
+        <ul>
+          {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
+            <li key={i}>
+              <p>To: {recipient}</p>
+              <p>Amount: {amount}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+    </div>
+    ));
+  };
+
   return (
     <div className="blockchain-page">
       <h1>Blockchain</h1>
@@ -75,6 +115,7 @@ const Blockchain = () => {
           <TabList>
             <Tab>Fetch Blockchain</Tab>
             <Tab>Mine Block</Tab>
+            <Tab>Transactions</Tab>
             <Tab>Comming Soon</Tab>
           </TabList>
         
@@ -86,6 +127,10 @@ const Blockchain = () => {
             <h2>Mine Block</h2>
             <button onClick={mineBlock}>Mine Block</button>
             <p>{miningStatus}</p>
+          </TabPanel>
+          <TabPanel>
+            <h2>Transactions</h2>
+            {renderTransactions()}
           </TabPanel>
           <TabPanel>
             <h2>More Features Coming Soon</h2>
