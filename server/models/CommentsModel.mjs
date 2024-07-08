@@ -8,26 +8,37 @@ const commentSchema = new mongoose.Schema({
   },
   title: {
     type: String,
-    required: false,
-    uniqie: false,
-    // trim: true // removes leading and trailing white spaces
-    maxlength: [100, 'Title cannot be more than 100 characters']
+    required: [true, 'Title is required'],
+    unique: false,
+    maxlength: [200, 'Title cannot be more than 200 characters']
+  },
+  isMainTopic: {
+    type: Boolean,
+    default: function() {
+      return !this.title.includes('.');
+    }
+  },
+  parentTopic: {
+    type: String,
+    required: function() {
+      return this.title.includes('.');
+    },
+    default: null
   },
   subject: {
     type: String,
     required: true,
     unique: false,
-    validate: { // Custom validator instead of maxLength
+    validate: {
       validator: function(v) {
-        // Check if the subject starts with '1337'
         if (v.startsWith('1337')) {
-          return v.length <= 1337; // LeatSpeaker activated, allow up to 1337 characters
+          return v.length <= 1337;
         } else {
-          return v.length <= 1000; // Allow up to 1000 characters
+          return v.length <= 1000;
         }
       },
-      message: props => `Subject cannot be more than ${props.value.startsWith('1000') ? 1337 : 1000} characters`
-    }  
+      message: props => `Subject cannot be more than ${props.value.startsWith('1337') ? 1337 : 1000} characters`
+    }
   },
   userName: {
     type: String,
@@ -50,5 +61,8 @@ const commentSchema = new mongoose.Schema({
     enum: ['massively positive', 'positive', 'neutral', 'negative', 'massively negative'],
   },
 });
+
+// Add an index to improve query performance
+commentSchema.index({ title: 1, createdAt: -1 });
 
 export default mongoose.model('Comment', commentSchema);

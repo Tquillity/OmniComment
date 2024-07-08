@@ -6,9 +6,19 @@ import Comment from '../models/CommentsModel.mjs';
 // @route POST /api/v1/comments
 // @access  PRIVATE
 export const addComment = asyncHandler(async (req, res, next) => {
-  const comment = await Comment.create(req.body);
+  let commentData = req.body;
   
-  res.status(201).json({ 
+  if (commentData.title.includes('.')) {
+    if (!commentData.parentTopic) {
+      return next(new ErrorResponse('Parent topic is required for comments', 400));
+    }
+  } else {
+    commentData.parentTopic = null;
+  }
+
+  const comment = await Comment.create(commentData);
+  
+  res.status(201).json({
     success: true,
     statusCode: 201,
     data: comment,
@@ -45,30 +55,27 @@ export const getComment = asyncHandler(async(req, res, next) => {
  });
 });
 
-// @desc  Fetch all comments
+// @desc Fetch all comments
 // @route GET /api/v1/comments/
-// @access  PUBLIC
+// @access PUBLIC
 export const getComments = asyncHandler(async(req, res, next) => {
-  
   let query;
   let queryString;
   let reqQuery = { ...req.query };
-  const excludeFields = ['select', 'sort', 'page', 'pageSize']; // Exclude these fields from the request query
-
+  const excludeFields = ['select', 'sort', 'page', 'pageSize'];
   excludeFields.forEach(field => delete reqQuery[field]);
-
-  queryString = JSON.stringify(reqQuery).replace(
-    /\b(lt|lte|gt|gte|in)\b/g, 
-    match => `$${match}`
-  ); // ! Studdy "Regular Expressions"
   
+  queryString = JSON.stringify(reqQuery).replace(
+    /\b(lt|lte|gt|gte|in)\b/g,
+    match => `$${match}`
+  );
+
   // Creates a query but does not execute it
   query = Comment.find(JSON.parse(queryString));
-  
+
   // SELECT (Projection): If asked for a specific selection of fields
   if (req.query.select) {
     const fields = req.query.select.split(',').join(' ');
-    // Select only the fields requested
     query = query.select(fields);
   }
 
@@ -76,47 +83,58 @@ export const getComments = asyncHandler(async(req, res, next) => {
   if (req.query.sort) {
     const sortBy = req.query.sort.split(',').join(' ');
     query = query.sort(sortBy);
+  } else {
+    // Default sort: main topics first, then by creation date
+    query = query.sort({ isMainTopic: -1, createdAt: -1 });
   }
 
   // PAGINATION: If asked for pagination
-  const pages = await Comment.countDocuments(JSON.parse(queryString));
+  const totalDocuments = await Comment.countDocuments(JSON.parse(queryString));
   const pageNo = parseInt(req.query.page) || 1;
-  const pageSize = parseInt(req.query.pageSize) || pages;
-  const page = (pageNo - 1) * pageSize;
+  const pageSize = parseInt(req.query.pageSize) || totalDocuments;
+  const skip = (pageNo - 1) * pageSize;
 
-  // Skip the number of documents to get to the page and limit the number of documents to the page size
-  query = query.skip(page).limit(pageSize);
+  query = query.skip(skip).limit(pageSize);
 
   // Execute the query
   const comments = await query;
 
+  // Process comments to group them by main topics
+  const processedComments = comments.reduce((acc, comment) => {
+    if (!comment.parentTopic) {
+      // This is a main topic
+      acc.push({
+        ...comment.toObject(),
+        comments: comments.filter(c => c.parentTopic === comment.title)
+      });
+    }
+    return acc;
+  }, []);
+
   const pagination = {};
+  pagination.totalDocuments = totalDocuments;
+  pagination.totalPages = Math.ceil(totalDocuments / pageSize);
 
-pagination.totalDocuments = pages;
-pagination.totalPages = Math.ceil(pages / pageSize);
-
-  // Are there more pages?
-  if (page * pageSize < pages && pageSize < pages) {
+  if (skip + pageSize < totalDocuments) {
     pagination.next = {
       page: pageNo + 1,
       pageSize,
     };
   }
 
-  // Are there previous pages?
-  if (page > 0) {
+  if (skip > 0) {
     pagination.prev = {
-      page: page -1,
+      page: pageNo - 1,
       pageSize,
     };
   }
 
   res.status(200).json({
-   success: true,
-   statusCode: 200,
-   items: comments.length,
-   pagination,
-   data: comments,
+    success: true,
+    statusCode: 200,
+    items: processedComments.length,
+    pagination,
+    data: processedComments,
   });
 });
 
@@ -124,7 +142,15 @@ pagination.totalPages = Math.ceil(pages / pageSize);
 // @route PUT /api/v1/comments/
 // @access  PRIVATE
 export const updateComment = asyncHandler(async(req, res, next) => {
-  await Comment.findByIdAndUpdate(req.params.id, req.body);s
+  const comment =  await Comment.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  
 
-  res.status(204).send();
+  res.status(200).json({
+    success: true,
+    statusCode: 200,
+    data: comment,
+  });
 });
