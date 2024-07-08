@@ -31,6 +31,11 @@ export default class TransactionPool {
     this.transactionsMap = {};
   }
 
+  // Method to return all transactions in the pool
+  getAllTransactions(){
+    return Object.values(this.transactionMap);
+  }
+
   // Method to replace the current transaction map with a new one
   replaceTransactionMap(transactionMap) {
     this.transactionMap = transactionMap;

@@ -133,4 +133,26 @@ describe('TransactionPool', () => {
       expect(newTransactionPool.transactionMap).toEqual(newTransactionMap);
     });
   });
+
+  describe('getAllTransactions method', () => {
+    it('Should return an arrau of all transactions', () => {
+      const transaction1 = new Transaction({
+        sender,
+        recipient: 'Angela',
+        amount: 100,
+      });
+      const transaction2 = new Transaction({
+        sender,
+        recipient: 'Mikael',
+        amount: 50,
+      });
+
+      transactionPool.addTransaction(transaction1);
+      transactionPool.addTransaction(transaction2);
+
+      const transactions = transactionPool.getAllTransactions();
+
+      expect(transactions).toEqual([transaction1, transaction2]);
+    });
+  });
 });

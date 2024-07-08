@@ -30,6 +30,17 @@ export const addTransaction = (req, res, next) => {
   res.status(201).json({ success: true, statusCode: 201, data: transaction });
 };
 
+export const getAllTransactions = (req, res, next) => {
+  const transactions= transactionPool.getAllTransactions();
+  res
+  .status(200)
+  .json({
+    success: true,
+    statusCode: 200,
+    data: transactions,
+  });
+};
+
 export const getTransactionPool = (req, res, next) => {
   res
     .status(200)
@@ -39,6 +50,7 @@ export const getTransactionPool = (req, res, next) => {
       data: transactionPool.transactionMap,
     });
 };
+
 
 export const getWalletBalance = (req, res, next) => {
   const address = wallet.publicKey;

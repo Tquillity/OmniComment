@@ -35,9 +35,9 @@ const Blockchain = () => {
 
   const fetchTransactions = async () => {
     try {
-      const response = await axios.get('http://localhost:5001/api/v1/wallet/transactions');
+      const response = await axios.get('http://localhost:5001/api/v1/wallet/transactions/all');
       if (response.data.success) {
-        setTransactions(Object.values(response.data.data));
+        setTransactions(response.data.data);
       } else {
         setError('Failed to fetch transactions');
       }
@@ -50,7 +50,15 @@ const Blockchain = () => {
   const mineBlock = async () => {
     setMiningStatus('Mining block...');
     try {
-      const response = await axios.post('http://localhost:5001/api/v1/block/mine');
+      const commentsResponse = await axios.get('http://localhost:5001/api/v1/comments');
+      const comments = commentsResponse.data.data;
+
+      const blockData = {
+        comments: comments,
+      };
+
+      const response = await axios.post('http://localhost:5001/api/v1/block/mine', blockData);
+
       if (response.data.success) {
         setMiningStatus('Block mined successfully');
         fetchBlockchainData();
@@ -89,7 +97,7 @@ const Blockchain = () => {
 
     return transactions.map((transaction, index) => (
       <div key={index} className="transaction">
-      <h3>Transaction {index}</h3>
+      <h3>Transaction {index + 1}</h3>
       <p>ID: {transaction.id}</p>
       <p>From: {transaction.inputMap.address}</p>
       <div>
