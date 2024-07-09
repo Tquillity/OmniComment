@@ -124,6 +124,7 @@ const Register = () => {
         onClose={handleModalClose}
         title={modalState.title}
         message={modalState.message}
+        isError={modalState.isError}
       />
 
     </div>
