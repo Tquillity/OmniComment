@@ -10,10 +10,12 @@
 @import './styles/reset.scss';
 @import './styles/main.scss';
 
-// Layouts
-@import './styles/layout/header.scss';
-@import './styles//layout/ThemeToggle.scss';
+// Layouts & Components
+@import './styles/components/modal.scss';
+@import './styles/components/header.scss';
+@import './styles/components/layout/ThemeToggle.scss';
 
 // Pages
+@import './styles/Pages/register.scss';
 @import './styles/Pages/blockchain.scss';
 @import './styles/Pages/omnicomment.scss';

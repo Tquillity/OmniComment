@@ -1,49 +1,132 @@
-// WorkInProgress.jsx
 import React, { useState } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Modal from '../components/Modal';
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    userName: '',
+    username: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    isError: false
+  });
+  const navigate = useNavigate();
 
-  const { username, email, password } = formData;
+  const { username, email, password, confirmPassword } = formData;
 
-  const onchange = (e) => {
+  const onChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   }
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    try{
+    if (password !== confirmPassword) {
+      setModalState({
+        isOpen: true,
+        title: 'Registration Error',
+        message: 'Passwords do not match.',
+        isError: true
+      });
+      return;
+    }
+    try {
       const res = await axios.post('http://localhost:5001/api/v1/auth/register', formData);
-      console.log(res.data);      
-      // ! Redirect to login page
+      console.log(res.data);
+      setModalState({
+        isOpen: true,
+        title: 'Registration Successful',
+        message: 'Your account has been created successfully.',
+        isError: false
+      });
     } catch (err) {
       console.error(err.response.data);
+      setModalState({
+        isOpen: true,
+        title: 'Registration Error',
+        message: err.response.data.message || 'An error occurred during registration.',
+        isError: true
+      });
+    }
+  };
+
+  const handleModalClose = () => {
+    setModalState(prev => ({ ...prev, isOpen: false }));
+    if (!modalState.isError) {
+      navigate('/login');
     }
   };
 
   return (
-    <form onSubmit={onSubmit}>
-      <h1>Register</h1>
-      <div>
-        <label>Username</label>
-        <input type="text" name="username" value={username} onChange={onchange} required />
+    <div className="register-container">
+      <div className="register-form">
+        <h1>Register</h1>
+        <form onSubmit={onSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username:</label>
+            <input
+              id="username"
+              type="text"
+              placeholder='Username'
+              name="username"
+              value={username}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="email">Email Address:</label>
+            <input
+              id="email"
+              type="email"
+              placeholder='Email Address'
+              name="email"
+              value={email}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input
+              id="password"
+              type="password"
+              placeholder='Password'
+              name="password"
+              value={password}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={onChange}
+              required
+            />
+          </div>
+          <button type="submit">Register</button>
+        </form>
       </div>
-      <div>
-        <label>Email</label>
-        <input type="email" name="email" value={email} onChange={onchange} required />
-      </div>
-      <div>
-        <label>Password</label>
-        <input type="password" name="password" value={password} onChange={onchange} required />
-      </div>
-      <button type="submit">Register</button>
-    </form>
+    
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={handleModalClose}
+        title={modalState.title}
+        message={modalState.message}
+      />
+
+    </div>
   );
 };
 
