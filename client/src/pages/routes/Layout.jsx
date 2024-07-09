@@ -21,7 +21,7 @@ const Layout = () => {
   };
 
   return (
-    <>
+    <div id="root">
       
       <Header auth={auth} logout={logout} />
       
@@ -31,7 +31,7 @@ const Layout = () => {
 
       <Footer />
 
-    </>
+    </div>
   );
 }
 

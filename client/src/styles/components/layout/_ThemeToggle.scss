@@ -1,6 +1,7 @@
 .theme-toggle {
   position: relative;
   margin-right: pxToRem(20);
+  margin-top: pxToRem(6);
 }
 
 .theme-toggle-checkbox {
@@ -36,7 +37,7 @@
 
 .theme-toggle-label::after {
   content: '🌙';
-  left: pxToRem(30);
+  left: pxToRem(25);
 }
 
 .theme-toggle-checkbox:checked + .theme-toggle-label::after {
@@ -58,8 +59,8 @@
   background-color: grey;
   border-radius: 50%;
   position: absolute;
-  top: pxToRem(3);
-  left: pxToRem(2);
+  top: pxToRem(1);
+  left: pxToRem(1);
   transition: transform 0.3s;
 }
 

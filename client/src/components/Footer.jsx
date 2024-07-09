@@ -1,8 +1,9 @@
+// Footer.jsx
 import React from 'react';
 
 const Footer = () => {
   return (
-    <footer>
+    <footer className="footer-container">
       <p>© 2024 OmniComment</p>
     </footer>
   );

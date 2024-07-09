@@ -19,3 +19,19 @@ export const loginUser = async (credentials) => {
     throw new Error(error.response?.data?.message || 'An error occurred during login.');
   }
 };
+
+export const getUserInfo = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('No token found');
+
+    const response = await axios.get(`${API_URL}/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    return response.data.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Error fetching user info');
+  }
+};

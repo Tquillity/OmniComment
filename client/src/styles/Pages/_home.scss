@@ -1,0 +1,33 @@
+// Home.scss
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: pxToRem(20);
+  background-color: var(--background-color);
+  color: var(--font-color);
+
+  h1, h2, p {
+    text-align: center;
+    max-width: pxToRem(600);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  h1 {
+    font-size: pxToRem(36);
+    margin-bottom: pxToRem(20);
+    color: var(--primary-color);
+  }
+
+  h2 {
+    font-size: pxToRem(24);
+    margin-bottom: pxToRem(16);
+  }
+
+  p {
+    font-size: pxToRem(18);
+    line-height: 1.6;
+  }
+}

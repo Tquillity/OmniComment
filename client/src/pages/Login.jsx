@@ -36,7 +36,7 @@ const Login = () => {
       const res = await loginUser(formData);
       localStorage.setItem('token', res.token);
       setAuth(true);
-      navigate('/trending');
+      navigate('/');
     } catch (error) {
       showModal('Login Error', error.message, true);
     }
