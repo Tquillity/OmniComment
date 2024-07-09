@@ -38,6 +38,10 @@ const userSchema = new mongoose.Schema({
   comment: {
     type: mongoose.Schema.ObjectId,
     ref: 'Comment',
+  },
+  balance: {
+    type: Number,
+    default: 0,
   }
 });
 
