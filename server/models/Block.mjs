@@ -33,7 +33,7 @@ export default class Block {
     );
 
     return new this({
-      timestamp,
+      timestamp, 
       lastHash,
       hash,
       nonce,
@@ -45,7 +45,7 @@ export default class Block {
   static adjustDifficultyLevel({ block, timestamp }) {
     const { difficulty } = block;
 
-    if ( timestamp -block.timestamp > MINE_RATE) return difficulty - 1;
+    if ( timestamp - block.timestamp > MINE_RATE) return difficulty - 1;
 
     return difficulty + 1;
   }
