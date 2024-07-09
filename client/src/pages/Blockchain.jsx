@@ -50,11 +50,19 @@ const Blockchain = () => {
   const mineBlock = async () => {
     setMiningStatus('Mining block...');
     try {
-      const commentsResponse = await axios.get('http://localhost:5001/api/v1/comments');
-      const comments = commentsResponse.data.data;
+      const lastBlockResponse = await axios.get('http://localhost:5001/api/v1/blockchain/lastBlock');
+      const lastBlockTimestamp = lastBlockResponse.data.data.timestamp;
+      console.log('Last block timestamp:', lastBlockTimestamp); // ! Debugging
+      
+      const newCommentResponse = await axios.get(`http://localhost:5001/api/v1/comments?since=${lastBlockTimestamp}`);
+      console.log('New comments:', newCommentResponse.data); // ! Debugging
+
+      const newTransactionsResponse = await axios.get(`http://localhost:5001/api/v1/wallet/transactions?since=${lastBlockTimestamp}`);
+      console.log('New transactions:', newTransactionsResponse.data); // ! Debugging
 
       const blockData = {
-        comments: comments,
+        comments: newCommentResponse.data.data,
+        transactions: newTransactionsResponse.data.data
       };
 
       const response = await axios.post('http://localhost:5001/api/v1/block/mine', blockData);
@@ -62,11 +70,12 @@ const Blockchain = () => {
       if (response.data.success) {
         setMiningStatus('Block mined successfully');
         fetchBlockchainData();
+        fetchTransactions();
       } else {
         setMiningStatus('Failed to mine Block.');
       }
     } catch (err) {
-      console.error('Error mining block', err);
+      console.error('Error mining block:', err.response ? err.response.data : err.message);
       setMiningStatus('Error mining block');
     }
   };

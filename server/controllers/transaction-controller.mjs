@@ -27,11 +27,26 @@ export const addTransaction = (req, res, next) => {
   transactionPool.addTransaction(transaction);
   pubnubServer.broadcastTransaction(transaction);
 
-  res.status(201).json({ success: true, statusCode: 201, data: transaction });
+  res.status(201).json({
+    success: true,
+    statusCode: 201,
+    data: {
+      _id: transaction.id,
+      ...transaction
+    }
+  });
 };
 
 export const getAllTransactions = (req, res, next) => {
   const transactions= transactionPool.getAllTransactions();
+
+  if(req.query.since) {
+    const sinceTimestamp = parseInt(req.query.since);
+    transactions = transactions.filter(transaction =>
+      transaction.inputMap.timestamp > sinceTimestamp
+    );  
+  }
+
   res
   .status(200)
   .json({
