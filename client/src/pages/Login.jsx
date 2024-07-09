@@ -1,51 +1,78 @@
-// WorkInProgress.jsx
+// Login.jsx
 import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import useForm from '../hooks/useForm';
+import { loginUser } from '../services/authServices';
+import Modal from '../components/Modal';
+
+const initialState = {
+  email: '',
+  password: '',
+};
 
 const Login = () => {
-const navigate = useNavigate();
-const { setAuth } = useOutletContext();
-
-  const[formData, setFormData] = useState({
-    email: '',
-    password: '',
+  const navigate = useNavigate();
+  const { setAuth } = useOutletContext();
+  const [formData, handleChange] = useForm(initialState);
+  const [modalState, setModalState] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    isError: false
   });
 
-  const { email, password } = formData;
+  const showModal = (title, message, isError) => {
+    setModalState({
+      isOpen: true,
+      title,
+      message,
+      isError
+    });
+  };
 
-  const onChange = (e) =>  setFormData({ ...formData, [e.target.name]: e.target.value });
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-      const res = await axios.post('http://localhost:5001/api/v1/auth/login', formData);
-      localStorage.setItem('token', res.data.token);
-      console.log(res.data);
+    try {
+      const res = await loginUser(formData);
+      localStorage.setItem('token', res.token);
       setAuth(true);
       navigate('/trending');
-    } catch (err) {
-      if (err.response) {
-        console.error(err.response.data);
-      } else {
-        console.error('Error:', err.message);
-      }
+    } catch (error) {
+      showModal('Login Error', error.message, true);
     }
   };
 
+  const handleModalClose = () => {
+    setModalState(prev => ({ ...prev, isOpen: false }));
+  };
+
   return (
-    <form onSubmit={onSubmit}>
-      <h1>Login</h1>
-      <div>
-        <label>Email</label>
-        <input type="email" name="email" value={email} onChange={onChange} required />
-      </div>
-      <div>
-        <label>Password</label>
-        <input type="password" name="password" value={password} onChange={onChange} required />
-      </div>
-      <button type="submit">Login</button>
-    </form>  
+    <div className="login-container">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h1>Login</h1>
+        {['email', 'password'].map((field) => (
+          <div key={field} className="form-group">
+            <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+            <input
+              id={field}
+              type={field === 'password' ? 'password' : 'email'}
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        ))}
+        <button type="submit">Login</button>
+      </form>
+      <Modal
+        isOpen={modalState.isOpen}
+        onClose={handleModalClose}
+        title={modalState.title}
+        message={modalState.message}
+        isError={modalState.isError}
+      />
+    </div>
   );
 };
 

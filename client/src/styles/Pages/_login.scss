@@ -1,0 +1,65 @@
+// login.scss
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+
+  .login-form {
+    background-color: var(--card-color);
+    padding: pxToRem(32);
+    border-radius: pxToRem(8);
+    box-shadow: 0 pxToRem(4) pxToRem(6) rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: pxToRem(400);
+
+    h1 {
+      text-align: center;
+      margin-bottom: pxToRem(24);
+      color: var(--font-color);
+    }
+
+    .form-group {
+      margin-bottom: pxToRem(16);
+
+      label {
+        display: block;
+        margin-bottom: pxToRem(8);
+        color: var(--font-color);
+      }
+
+      input {
+        width: 100%;
+        padding: pxToRem(12);
+        border: pxToRem(1) solid var(--border-color);
+        border-radius: pxToRem(4);
+        font-size: pxToRem(16);
+        background-color: var(--background-color);
+        color: var(--font-color);
+
+        &:focus {
+          outline: none;
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 pxToRem(2) rgba(52, 152, 219, 0.25);
+        }
+      }
+    }
+
+    button {
+      width: 100%;
+      background-color: var(--button-primary-color);
+      color: var(--button-text-color);
+      border: none;
+      padding: pxToRem(12);
+      border-radius: pxToRem(4);
+      font-size: pxToRem(16);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: var(--secondary-color);
+      }
+    }
+  }
+}

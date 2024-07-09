@@ -10,3 +10,12 @@ export const registerUser = async (userData) => {
     throw new Error(error.response?.data?.message || 'An error occurred during registration.');
   }
 };
+
+export const loginUser = async (credentials) => {
+  try {
+    const response = await axios.post(`${API_URL}/login`, credentials);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'An error occurred during login.');
+  }
+};
