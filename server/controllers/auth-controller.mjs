@@ -7,7 +7,11 @@ import { asyncHandler } from '../middleware/asyncHandler.mjs';
 // @route   POST /api/v1/auth/register
 // @access  PUBLIC
 export const register = asyncHandler(async (req, res, next) => {
-  const  { username, email, password, role } = req.body;
+  const  { username, email, password, confirmPassword, role } = req.body;
+
+  if (password !== confirmPassword) {
+    return next(new ErrorResponse('Passwords do not match', 400));
+  }
 
   const user = await User.create({ username, email, password, role });
 

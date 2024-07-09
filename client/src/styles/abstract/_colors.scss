@@ -34,8 +34,8 @@ $dark-success-color: #69db7c;
   --border-color: #{$light-border-color};
   --card-color: #{$light-card-color};
   --font-color: #{$light-font-color};
-  --error-color:#(light-error-color);
-  --success-color:#(light-success-color);
+  --error-color: #{$light-error-color};
+  --success-color: #{$light-success-color};
 }
 
 [data-theme='dark'] {
