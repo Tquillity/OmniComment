@@ -51,7 +51,7 @@ const OmniComment = ({ auth }) => {
       return;
     }
     try {
-      await axios.post(
+      const transactionRes = await axios.post(
         'http://localhost:5001/api/v1/wallet/transaction',
         {
           amount: 20,
@@ -73,6 +73,7 @@ const OmniComment = ({ auth }) => {
           userName,
           sourceAddress: 'forum',
           commentVibes: 'neutral',
+          transactionId: transactionRes.data.data._id,
         },
         {
           headers: {
@@ -96,7 +97,7 @@ const OmniComment = ({ auth }) => {
       return;
     }
     try {
-      await axios.post(
+      const transactionRes = await axios.post(
         'http://localhost:5001/api/v1/wallet/transaction',
         {
           amount: 10,
@@ -119,6 +120,7 @@ const OmniComment = ({ auth }) => {
           userName,
           sourceAddress: selectedTopic.sourceAddress,
           commentVibes: 'neutral',
+          transactionId: transactionRes.data.data._id,
         },
         {
           headers: {

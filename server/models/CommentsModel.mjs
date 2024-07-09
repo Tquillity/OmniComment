@@ -60,6 +60,11 @@ const commentSchema = new mongoose.Schema({
     unique: false,
     enum: ['massively positive', 'positive', 'neutral', 'negative', 'massively negative'],
   },
+  transactionId: {
+    type: String,
+    required: true,
+    unique: true,
+  }
 });
 
 // Add an index to improve query performance

@@ -1,6 +1,7 @@
 import { asyncHandler } from '../middleware/asyncHandler.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import Comment from '../models/CommentsModel.mjs';
+import { transactionPool } from '../server.mjs';
 
 // @desc  Add a comment
 // @route POST /api/v1/comments
@@ -14,6 +15,17 @@ export const addComment = asyncHandler(async (req, res, next) => {
     }
   } else {
     commentData.parentTopic = null;
+  }
+
+  // Check if transactionId is provided
+  if (!commentData.transactionId) {
+    return next(new ErrorResponse('Transaction ID is required', 400));
+  }
+
+  // Verify that the transaction exists
+  const transaction = await transactionPool.transactionMap[commentData.transactionId];
+  if (!transaction) {
+    return next(new ErrorResponse('Invalid Transaction ID', 400));
   }
 
   const comment = await Comment.create(commentData);
@@ -62,7 +74,7 @@ export const getComments = asyncHandler(async(req, res, next) => {
   let query;
   let queryString;
   let reqQuery = { ...req.query };
-  const excludeFields = ['select', 'sort', 'page', 'pageSize'];
+  const excludeFields = ['select', 'sort', 'page', 'pageSize', 'since'];
   excludeFields.forEach(field => delete reqQuery[field]);
   
   queryString = JSON.stringify(reqQuery).replace(
@@ -70,8 +82,16 @@ export const getComments = asyncHandler(async(req, res, next) => {
     match => `$${match}`
   );
 
+  console.log('Query String:', queryString); // ! Debugging
+
   // Creates a query but does not execute it
   query = Comment.find(JSON.parse(queryString));
+
+   // Handle 'since' parameter
+   if (req.query.since) {
+    const sinceDate = new Date(parseInt(req.query.since));
+    query = query.where('createdAt').gte(sinceDate);
+  }
 
   // SELECT (Projection): If asked for a specific selection of fields
   if (req.query.select) {
@@ -98,6 +118,7 @@ export const getComments = asyncHandler(async(req, res, next) => {
 
   // Execute the query
   const comments = await query;
+  console.log('Comments found:', comments.length); // ! Debugging
 
   // Process comments to group them by main topics
   const processedComments = comments.reduce((acc, comment) => {
