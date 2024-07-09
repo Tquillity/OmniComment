@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Modal from '../components/Modal';
+import useForm from '../hooks/useForm';
+import { registerUser } from '../services/authServices';
+
+const initialState = {
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+};
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const [formData, handleChange] = useForm(initialState);
   const [modalState, setModalState] = useState({
     isOpen: false,
     title: '',
@@ -18,40 +21,27 @@ const Register = () => {
   });
   const navigate = useNavigate();
 
-  const { username, email, password, confirmPassword } = formData;
+  const showModal = (title, message, isError) => {
+    setModalState({
+      isOpen: true,
+      title,
+      message,
+      isError
+    });
+  };
 
-  const onChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  }
-
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setModalState({
-        isOpen: true,
-        title: 'Registration Error',
-        message: 'Passwords do not match.',
-        isError: true
-      });
+    if (formData.password !== formData.confirmPassword) {
+      showModal('Registration Error', 'Passwords do not match.', true);
       return;
     }
+
     try {
-      const res = await axios.post('http://localhost:5001/api/v1/auth/register', formData);
-      console.log(res.data);
-      setModalState({
-        isOpen: true,
-        title: 'Registration Successful',
-        message: 'Your account has been created successfully.',
-        isError: false
-      });
-    } catch (err) {
-      console.error(err.response.data);
-      setModalState({
-        isOpen: true,
-        title: 'Registration Error',
-        message: err.response.data.message || 'An error occurred during registration.',
-        isError: true
-      });
+      await registerUser(formData);
+      showModal('Registration Successful', 'Your account has been created successfully.', false);
+    } catch (error) {
+      showModal('Registration Error', error.message || 'An error occurred during registration.', true);
     }
   };
 
@@ -66,59 +56,24 @@ const Register = () => {
     <div className="register-container">
       <div className="register-form">
         <h1>Register</h1>
-        <form onSubmit={onSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username:</label>
-            <input
-              id="username"
-              type="text"
-              placeholder='Username'
-              name="username"
-              value={username}
-              onChange={onChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email Address:</label>
-            <input
-              id="email"
-              type="email"
-              placeholder='Email Address'
-              name="email"
-              value={email}
-              onChange={onChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password:</label>
-            <input
-              id="password"
-              type="password"
-              placeholder='Password'
-              name="password"
-              value={password}
-              onChange={onChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password:</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              placeholder="Confirm Password"
-              name="confirmPassword"
-              value={confirmPassword}
-              onChange={onChange}
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit}>
+          {['username', 'email', 'password', 'confirmPassword'].map((field) => (
+            <div key={field} className="form-group">
+              <label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}:</label>
+              <input
+                id={field}
+                type={field.toLowerCase().includes('password') ? 'password' : field === 'email' ? 'email' : 'text'}
+                placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          ))}
           <button type="submit">Register</button>
         </form>
       </div>
-    
       <Modal
         isOpen={modalState.isOpen}
         onClose={handleModalClose}
@@ -126,7 +81,6 @@ const Register = () => {
         message={modalState.message}
         isError={modalState.isError}
       />
-
     </div>
   );
 };
