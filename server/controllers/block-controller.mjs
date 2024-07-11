@@ -1,12 +1,14 @@
-import { pubnubServer } from '../server.mjs';
-import { blockchain } from '../server.mjs';
+import { asyncHandler } from '../middleware/asyncHandler.mjs';
+import { blockchain, pubnubServer } from '../server.mjs';
+import Comment from '../models/CommentsModel.mjs';
 
-export const mineBlock = (req, res, next) => {
-  const data = req.body;
+export const mineBlock = asyncHandler(async(req, res, next) => {
+  const lastBlock = blockchain.chain[blockchain.chain.length - 1];
+  const newComments = await Comment.find({ createdAt: { $gt: lastBlock.timestamp }});
 
-  const block = blockchain.addBlock({ data: data });
+  const block = blockchain.addBlock({ data: newComments });
 
   pubnubServer.broadcast();
 
   res.status(201).json({ success: true, statusCode: 201, data: block});
-};
+});
