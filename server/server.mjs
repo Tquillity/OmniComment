@@ -156,17 +156,29 @@ app.use(errorHandler);
 const PORT = NODE_PORT || DEFAULT_PORT;
 
 // Start the Express server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port: ${PORT}`.green.bgBlack);
+const startServer = async () => {
+  try {
+    await blockchain.initializeChain();
 
-  // If the port is not the default port, synchronize the blockchain
-  if (PORT !== DEFAULT_PORT) {
-    synchronize();
+    const server = app.listen(PORT, () => {
+    console.log(`Server running on port: ${PORT}`.green.bgBlack);
+
+    // If the port is not the default port, synchronize the blockchain
+    if (PORT !== DEFAULT_PORT) {
+      synchronize();
+    }
+  });
+
+  // Handle unhandled rejections
+  process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`.red);
+    server.close(() => process.exit(1));
+  });
+  
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
-});
+};
 
-// Handle unhandled rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`.red);
-  server.close(() => process.exit(1));
-});
+startServer();

@@ -2,21 +2,46 @@ import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
 import { createHash } from '../utilities/crypto-lib.mjs';
 import Block from './Block.mjs';
 import Transaction from './Transaction.mjs';
+import BlockModel from '../models/BlockModel.mjs';
 
 export default class Blockchain {
   constructor() {
     this.chain = [Block.genesis];
+    this.initializeChain();
+  }
+
+  async initializeChain() {
+    const blocks = await BlockModel.find().sort('timestamp');
+    if (blocks.length === 0) {
+      await this.saveBlock(this.chain[0]);
+    } else {
+      this.chain = blocks.map(block => new Block(block));
+    }
   }
 
   // Function to add a new block to the chain
-  addBlock({ data }) {
+  async addBlock({ data }) {
     const newBlock = Block.mineBlock({
       lastBlock: this.chain.at(-1),
       data: data,
     });
     this.chain.push(newBlock);
+    await this.saveBlock(newBlock);
     return newBlock;
   }
+
+  async saveBlock(block) {
+    const blockData = {
+      hash: block.hash,
+      lastHash: block.lastHash,
+      timestamp: block.timestamp,
+      nonce: block.nonce,
+      difficulty: block.difficulty,
+      data: block.data
+    };
+    await BlockModel.create(blockData);
+  }
+
 
   // Instance method to replace the current chain with a new chain
   replaceChain(chain, shouldValidate, callback) { 
