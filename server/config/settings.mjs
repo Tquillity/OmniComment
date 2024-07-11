@@ -9,6 +9,6 @@ export const GENESIS_DATA = {
   lastHash: '0',
   hash: '0',
   difficulty : INITIAL_DIFFICULTY,
-  nonce: 0,
+  nonce: 1337,
   data: [],
 };

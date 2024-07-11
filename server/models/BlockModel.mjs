@@ -29,4 +29,4 @@ const blockSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model('Block', blockSchema);
+export default mongoose.model('Block', blockSchema, 'blockchain');
