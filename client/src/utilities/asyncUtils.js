@@ -7,3 +7,12 @@ export const asyncHandler = (fn) => async (...args) => {
     return { error };
   }
 };
+
+export const handleAsyncAction = async (action) => {
+  try {
+    const message = await action();
+    if (message) alert(message);
+  } catch (error) {
+    alert(error.message || JSON.stringify(error));
+  }
+};

@@ -2,17 +2,19 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { INITIAL_BALANCE } from '../config/settings.mjs';
+import { ellipticHash } from '../utilities/crypto-lib.mjs';
 
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
-    required: [true, 'Please provide a username'], // First argument decides if the field is required, second argument is the error message
-    unique: true, // This field should be unique, no doubles usernames allowed
+    required: [true, 'Please provide a username'],
+    unique: true,
   },
   email: {
     type: String,
     required: [true, 'Please provide an email'],
-    unique: [true, 'This email is already in use'], // This field should be unique, no doubles emails allowed
+    unique: [true, 'This email is already in use'],
     match: [
       /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
       'Please provide a valid email',
@@ -27,7 +29,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 6,
-    select: false, // This field will not be returned in the response
+    select: false,
   },
   resetPasswordToken: String,
   resetPasswordTokenExpire: Date,
@@ -38,15 +40,37 @@ const userSchema = new mongoose.Schema({
   comment: {
     type: mongoose.Schema.ObjectId,
     ref: 'Comment',
-  }
+  },
+  walletPublicKey: {
+    type: String,
+    unique: true,
+  },
+  // ! This is just for demonstration purposes for use in this school project
+  // ! In a real application, this would be solved with a secure wallet service
+  // ! like MetaMask or a hardware wallet
+  walletPrivateKey: {
+    type: String,
+    select: false, 
+  },
+  balance: {
+    type: Number,
+    default: INITIAL_BALANCE,
+  },
 });
 
 // Create middleware for mongoose to hash the password before saving it to the database
 userSchema.pre('save', async function (next) {
-  if(!this.isModified('password')) {
+  if (!this.isModified('password')) {
     next();
   }
   this.password = await bcrypt.hash(this.password, 12);
+
+  // Generate wallet keys if they don't exist
+  if (!this.walletPublicKey || !this.walletPrivateKey) {
+    const keyPair = ellipticHash.genKeyPair();
+    this.walletPublicKey = keyPair.getPublic('hex');
+    this.walletPrivateKey = keyPair.getPrivate('hex');
+  }
 });
 
 // Method useable on schema instances
@@ -55,7 +79,7 @@ userSchema.methods.validatePassword = async function (passwordToCheck) {
 };
 
 userSchema.methods.generateToken = function () {
-  return jwt.sign({ id:this._id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 }
@@ -63,12 +87,13 @@ userSchema.methods.generateToken = function () {
 userSchema.methods.createResetPasswordToken = function () {
   const resetToken = crypto.randomBytes(20).toString('hex');
   this.resetPasswordToken = crypto
-  .createHash('sha256')
-  .update(resetToken)
-  .digest('hex');
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
   
   this.resetPasswordTokenExpire = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes 
 
   return this.resetPasswordToken;
 };
+
 export default mongoose.model('User', userSchema);

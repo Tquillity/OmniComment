@@ -6,10 +6,11 @@ import {
   getComments,
   updateComment,
 } from '../controllers/comments-controller.mjs';
+import { protect } from '../middleware/authorization.mjs';
 
 const router = express.Router();
 
-router.post('/', addComment);
+router.post('/', protect, addComment);
 router.delete('/:id', deleteComment);
 router.get('/:id', getComment);
 router.get('/', getComments);

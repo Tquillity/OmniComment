@@ -1,6 +1,8 @@
 import User from '../models/UserModel.mjs';
+import Wallet from '../models/Wallet.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import { asyncHandler } from '../middleware/asyncHandler.mjs';
+import { INITIAL_BALANCE } from '../config/settings.mjs';
 
 
 // @desc    Register a user
@@ -13,7 +15,16 @@ export const register = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Passwords do not match', 400));
   }
 
-  const user = await User.create({ username, email, password, role });
+  const wallet = new Wallet();
+  
+  const user = await User.create({
+    username,
+    email,
+    password,
+    role,
+    walletPublicKey: wallet.publicKey,
+    balance: INITIAL_BALANCE,
+  });
 
   createAndSendToken(user, 201, res);
 });
@@ -41,6 +52,9 @@ export const login = asyncHandler(async (req, res, next) => {
   if (!isCorrect) {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
+
+  const wallet = new Wallet();
+  wallet.publicKey = user.walletPublicKey;
 
   createAndSendToken(user, 200, res);
 });
