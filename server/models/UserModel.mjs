@@ -1,3 +1,5 @@
+// userModel.mjs
+
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
@@ -22,8 +24,20 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'manager', 'admin'],
+    enum: ['user', 'manager', 'admin', 'reward'],
     default: 'user',
+    validate: {
+      validator: async function (value) {
+        //! Check if the role is 'reward' and if another user already has this role
+        if (value === 'reward') {
+          const existingRewardUser = await this.constructor.findOne({ role: 'reward' });
+          if (existingRewardUser && existingRewardUser._id.toString() !== this._id.toString()) {
+            throw new Error('Only one user can have the reward role.');
+          }
+        }
+      },
+      message: 'Only one user can have the reward role.'
+    }
   },
   password: {
     type: String,
@@ -71,6 +85,7 @@ userSchema.pre('save', async function (next) {
     this.walletPublicKey = keyPair.getPublic('hex');
     this.walletPrivateKey = keyPair.getPrivate('hex');
   }
+  next();
 });
 
 // Method useable on schema instances
