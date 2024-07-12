@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { asyncHandler } from '../utilities/asyncUtils';
 import { getRandomPuzzle, checkPuzzleAnswer } from '../utilities/puzzleGenerator';
+import { useUser } from '../hooks/useUser';
 
 const Blockchain = () => {
   const [blockchainData, setBlockchainData] = useState([]);
@@ -13,6 +14,7 @@ const Blockchain = () => {
   const [transactions, setTransactions] = useState([]);
   const [puzzle, setPuzzle] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
+  const { user } = useUser();
 
   useEffect(() => {
     fetchBlockchainData();
@@ -47,7 +49,9 @@ const Blockchain = () => {
   };
 
   const mineBlock = asyncHandler(async () => {
-    const response = await axios.post('http://localhost:5001/api/v1/block/mine');
+    const response = await axios.post('http://localhost:5001/api/v1/block/mine', {
+      minerPublicKey: user.walletPublicKey
+    });
     if (response.data.success) {
       setMiningStatus('Block mined successfully');
       await fetchBlockchainData();
