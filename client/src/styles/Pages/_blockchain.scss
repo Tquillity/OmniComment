@@ -54,3 +54,11 @@
     }
   }
 }
+
+.puzzle-toggle {
+  margin-bottom: pxToRem(15);
+  
+  input[type="checkbox"] {
+    margin-right: pxToRem(8);
+  }
+}

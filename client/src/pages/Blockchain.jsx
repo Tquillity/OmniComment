@@ -15,6 +15,7 @@ const Blockchain = () => {
   const [puzzle, setPuzzle] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const { user } = useUser();
+  const [puzzleEnabled, setPuzzleEnabled] = useState(true);
 
   useEffect(() => {
     fetchBlockchainData();
@@ -61,18 +62,19 @@ const Blockchain = () => {
   });
 
   const handleMineBlock = () => {
-    const newPuzzle = getRandomPuzzle();
-    setPuzzle(newPuzzle);
-    setMiningStatus('Please solve the puzzle to mine the block');
+    if (puzzleEnabled) {
+      const newPuzzle = getRandomPuzzle();
+      setPuzzle(newPuzzle);
+      setMiningStatus('Please solve the puzzle to mine the block');
+    } else {
+      mineBlock();
+    }
   };
 
   const submitPuzzleAnswer = async () => {
     if (checkPuzzleAnswer(puzzle.question, userAnswer)) {
       setMiningStatus('Puzzle solved correctly. Mining block...');
-      const result = await mineBlock();
-      if (result && result.error) {
-        setMiningStatus('Error mining block');
-      }
+      await mineBlock();
     } else {
       setMiningStatus('Incorrect answer. Mining failed.');
     }
@@ -142,19 +144,33 @@ const Blockchain = () => {
         </TabPanel>
         <TabPanel>
           <h2>Mine Block</h2>
-          {puzzle ? (
-            <div>
-              <p>Solve this puzzle to mine the block: {puzzle.question}</p>
+          <div>
+            <label>
               <input
-                type="text"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder="Enter your answer"
+                type="checkbox"
+                checked={puzzleEnabled}
+                onChange={(e) => setPuzzleEnabled(e.target.checked)}
               />
-              <button onClick={submitPuzzleAnswer}>Submit Answer</button>
-            </div>
+              Enable Mining Puzzle
+            </label>
+          </div>
+          {puzzleEnabled ? (
+            puzzle ? (
+              <div>
+                <p>Solve this puzzle to mine the block: {puzzle.question}</p>
+                <input
+                  type="text"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Enter your answer"
+                />
+                <button onClick={submitPuzzleAnswer}>Submit Answer</button>
+              </div>
+            ) : (
+              <button onClick={handleMineBlock}>Mine Block</button>
+            )
           ) : (
-            <button onClick={handleMineBlock}>Mine Block</button>
+            <button onClick={mineBlock}>Mine Block</button>
           )}
           <p>{miningStatus}</p>
         </TabPanel>
