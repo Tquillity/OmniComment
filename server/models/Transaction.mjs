@@ -1,6 +1,7 @@
 import {v4 as uuidv4} from 'uuid';
 import { verifySignature } from '../utilities/crypto-lib.mjs';
-import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
+import { MINING_REWARD } from '../config/settings.mjs';
+import User from '../models/UserModel.mjs';
 
 // Define and export the Transaction class
 export default class Transaction {
@@ -14,10 +15,15 @@ export default class Transaction {
   }
 
   // Static method to create a reward transaction for miners
-  static transactionReward({ miner }) {
+  static async transactionReward({ miner }) {
+    const rewardUser = await User.findOne({ role: 'reward' });
+    if (!rewardUser) {
+      throw new Error('Reward user not found');
+    }
+  
     return new this({
-      inputMap: REWARD_ADDRESS, // Set the inputMap to the reward address
-      outputMap: { [miner.publicKey]: MINING_REWARD }, // Set the outputMap to the miner's public key with the mining reward
+      inputMap: { address: rewardUser.walletPublicKey },
+      outputMap: { [miner.publicKey]: MINING_REWARD },
     });
   }
 

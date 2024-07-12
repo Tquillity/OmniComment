@@ -1,8 +1,9 @@
-import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
+import { MINING_REWARD } from '../config/settings.mjs';
 import { createHash } from '../utilities/crypto-lib.mjs';
 import Block from './Block.mjs';
 import Transaction from './Transaction.mjs';
 import BlockModel from '../models/BlockModel.mjs';
+import User from '../models/UserModel.mjs';
 
 export default class Blockchain {
   constructor() {
@@ -42,7 +43,6 @@ export default class Blockchain {
     await BlockModel.create(blockData);
   }
 
-
   // Instance method to replace the current chain with a new chain
   replaceChain(chain, shouldValidate, callback) { 
     // Check if the new chain is longer than the current chain
@@ -62,7 +62,12 @@ export default class Blockchain {
   }
 
   // Instance method to validate transaction data in the chain
-  validateTransactionData({ chain }) {
+  async validateTransactionData({ chain }) {
+    const rewardUser = await User.findOne({ role: 'reward' });
+    if (!rewardUser) {
+      throw new Error('Reward user not found');
+    }
+
     // Iterate through each block in the chain starting from the second block
     for(let i = 1; i < chain.length; i++) {
       const block = chain[i];
@@ -72,7 +77,7 @@ export default class Blockchain {
       // Iterate through each transaction in the block
       for (let transaction of block.data) {
         // Check if the transaction is a reward transaction
-        if (transaction.inputMap.address === REWARD_ADDRESS.address) {
+        if (transaction.inputMap.address === rewardUser.walletPublicKey) {
           counter++;
 
           // There should be only one reward transaction per block
@@ -86,7 +91,7 @@ export default class Blockchain {
             return false;
           }
 
-          // Ensure each transactoin is unique in the block
+          // Ensure each transaction is unique in the block
           if (transactionSet.has(transaction)) {
             return false;
           } else {
@@ -96,7 +101,7 @@ export default class Blockchain {
       }
     }
 
-    // Return true if all transactoins are valid
+    // Return true if all transactions are valid
     return true;
   }
 

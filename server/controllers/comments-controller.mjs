@@ -26,6 +26,11 @@ export const addComment = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Insufficient balance', 400));
   }
 
+  const rewardUser = await User.findOne({ role: 'reward' });
+  if (!rewardUser) {
+    return next(new Error('Reward user not found'));
+  }
+
   const transaction = new Transaction({
     sender: {
       publicKey: user.walletPublicKey,
@@ -37,9 +42,12 @@ export const addComment = asyncHandler(async (req, res, next) => {
         return keyPair.sign(createHash(data)).toDER('hex');
       }
     },
-    recipient: 'forum-system',
+    recipient: rewardUser.walletPublicKey,
     amount: cost,
   });
+
+  rewardUser.balance += cost;
+  await rewardUser.save();
 
   transactionPool.addTransaction(transaction);
 

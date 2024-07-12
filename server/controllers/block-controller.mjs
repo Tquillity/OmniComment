@@ -4,14 +4,21 @@ import { blockchain, pubnubServer, transactionPool, wallet } from '../server.mjs
 import Comment from '../models/CommentsModel.mjs';
 import Transaction from '../models/Transaction.mjs';
 import User from '../models/UserModel.mjs';
+import { MINING_REWARD } from '../config/settings.mjs';
 
 export const mineBlock = asyncHandler(async(req, res, next) => {
   const lastBlock = blockchain.chain[blockchain.chain.length - 1];
   const newComments = await Comment.find({ createdAt: { $gt: lastBlock.timestamp }});
 
+  // Find the reward user
+  const rewardUser = await User.findOne({ role: 'reward' });
+  if (!rewardUser) {
+    return next(new Error('Reward user not found'));
+  }
+
   // Create a mining reward transaction
   const minerPublicKey = req.body.minerPublicKey;
-  const rewardTransaction = Transaction.transactionReward({ miner: { publicKey: minerPublicKey } });
+  const rewardTransaction = await Transaction.transactionReward({ miner: { publicKey: minerPublicKey } });
 
   // Add the reward transaction to the transaction pool
   transactionPool.addTransaction(rewardTransaction);
@@ -34,6 +41,13 @@ export const mineBlock = asyncHandler(async(req, res, next) => {
     miner.balance += rewardAmount;
     await miner.save();
   }
+
+  // Deduct the reward amount from the reward user's balance
+  rewardUser.balance -= MINING_REWARD;
+  if (rewardUser.balance < 0) {
+    return next(new Error('Insufficient balance in reward wallet'));
+  }
+  await rewardUser.save();
 
   pubnubServer.broadcast();
 
