@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import { asyncHandler } from '../utilities/asyncUtils';
+import { getRandomPuzzle, checkPuzzleAnswer } from '../utilities/puzzleGenerator';
 
 const Blockchain = () => {
   const [blockchainData, setBlockchainData] = useState([]);
@@ -10,6 +11,8 @@ const Blockchain = () => {
   const [error, setError] = useState(null);
   const [miningStatus, setMiningStatus] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [puzzle, setPuzzle] = useState(null);
+  const [userAnswer, setUserAnswer] = useState('');
 
   useEffect(() => {
     fetchBlockchainData();
@@ -44,7 +47,6 @@ const Blockchain = () => {
   };
 
   const mineBlock = asyncHandler(async () => {
-    setMiningStatus('Mining block...');
     const response = await axios.post('http://localhost:5001/api/v1/block/mine');
     if (response.data.success) {
       setMiningStatus('Block mined successfully');
@@ -54,11 +56,24 @@ const Blockchain = () => {
     }
   });
 
-  const handleMineBlock = async () => {
-    const result = await mineBlock();
-    if (result && result.error) {
-      setMiningStatus('Error mining block');
+  const handleMineBlock = () => {
+    const newPuzzle = getRandomPuzzle();
+    setPuzzle(newPuzzle);
+    setMiningStatus('Please solve the puzzle to mine the block');
+  };
+
+  const submitPuzzleAnswer = async () => {
+    if (checkPuzzleAnswer(puzzle.question, userAnswer)) {
+      setMiningStatus('Puzzle solved correctly. Mining block...');
+      const result = await mineBlock();
+      if (result && result.error) {
+        setMiningStatus('Error mining block');
+      }
+    } else {
+      setMiningStatus('Incorrect answer. Mining failed.');
     }
+    setPuzzle(null);
+    setUserAnswer('');
   };
 
   const renderBlockchainData = () => {
@@ -123,7 +138,20 @@ const Blockchain = () => {
         </TabPanel>
         <TabPanel>
           <h2>Mine Block</h2>
-          <button onClick={handleMineBlock}>Mine Block</button>
+          {puzzle ? (
+            <div>
+              <p>Solve this puzzle to mine the block: {puzzle.question}</p>
+              <input
+                type="text"
+                value={userAnswer}
+                onChange={(e) => setUserAnswer(e.target.value)}
+                placeholder="Enter your answer"
+              />
+              <button onClick={submitPuzzleAnswer}>Submit Answer</button>
+            </div>
+          ) : (
+            <button onClick={handleMineBlock}>Mine Block</button>
+          )}
           <p>{miningStatus}</p>
         </TabPanel>
         <TabPanel>
