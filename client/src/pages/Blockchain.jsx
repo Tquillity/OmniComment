@@ -58,17 +58,22 @@ const Blockchain = () => {
     }
   };
 
-const fetchWalletInfo = async () => {
-  setIsLoading(true);
-  try {
-    const response = await axios.get('http://localhost:5001/api/v1/wallet/info');
-    setWalletInfo(response.data.data);
-  } catch (error) {
-    setTransactionError('Error fetching wallet information: ' + error.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  const fetchWalletInfo = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get('http://localhost:5001/api/v1/wallet/info', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setWalletInfo(response.data.data);
+    } catch (error) {
+      setTransactionError('Error fetching wallet information: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const fetchTransactionPool = async () => {
     try {
@@ -178,38 +183,6 @@ const fetchWalletInfo = async () => {
         <p>Loading wallet information...</p>
       )}
 
-<h3>Confirmed Transactions</h3>
-      {transactions.length > 0 ? (
-        transactions.map((transaction, index) => {
-          const transactionNumber = transactions.length - index;
-          const sender = transaction.inputMap.address;
-          const [recipient, amount] = Object.entries(transaction.outputMap)[0];
-          const senderBalance = transaction.inputMap.amount - amount;
-
-          return (
-            <div key={index} className="transaction confirmed-transaction">
-              <h4>Transaction {transactionNumber}</h4>
-              <p className="truncate">ID: {transaction.id}</p>
-              <p className="truncate">From: {sender}</p>
-              <p>Sent Amount: {amount}</p>
-              <p>Balance: {senderBalance}</p>
-              <div>
-                <h5>Recipients:</h5>
-                <ul>
-                  <li>
-                    <p className="truncate">To: {recipient}</p>
-                    <p>Received Amount: {amount}</p>
-                  </li>
-                </ul>
-              </div>
-              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
-            </div>
-          );
-        })
-      ) : (
-        <p>No confirmed transactions</p>
-      )}
-
       <h3>Transaction Pool</h3>
       {transactionPool.length > 0 ? (
         transactionPool.map((transaction, index) => {
@@ -241,6 +214,38 @@ const fetchWalletInfo = async () => {
         })
       ) : (
         <p>No transactions in the pool</p>
+      )}
+
+      <h3>Confirmed Transactions</h3>
+      {transactions.length > 0 ? (
+        transactions.slice().reverse().map((transaction, index) => {
+          const transactionNumber = transactions.length - index;
+          const sender = transaction.inputMap.address;
+          const [recipient, amount] = Object.entries(transaction.outputMap)[0];
+          const senderBalance = transaction.inputMap.amount - amount;
+
+          return (
+            <div key={index} className="transaction confirmed-transaction">
+              <h4>Transaction {transactionNumber}</h4>
+              <p className="truncate">ID: {transaction.id}</p>
+              <p className="truncate">From: {sender}</p>
+              <p>Sent Amount: {amount}</p>
+              <p>Balance: {senderBalance}</p>
+              <div>
+                <h5>Recipients:</h5>
+                <ul>
+                  <li>
+                    <p className="truncate">To: {recipient}</p>
+                    <p>Received Amount: {amount}</p>
+                  </li>
+                </ul>
+              </div>
+              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+            </div>
+          );
+        })
+      ) : (
+        <p>No confirmed transactions</p>
       )}
     </div>
   );
