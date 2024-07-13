@@ -4,7 +4,6 @@
   width: 100%;
 }
 
-
 .blockchain-page {
   max-width: pxToRem(1200);
   width: 100%;
@@ -32,7 +31,7 @@
 
 .react-tabs {
   &__tab-list {
-    border-bottom: pxToRem(1) solid ;
+    border-bottom: pxToRem(1) solid;
     margin: 0 0 pxToRem(10);
     padding: 0;
   }
@@ -66,7 +65,7 @@
 
 .puzzle-toggle {
   margin-bottom: pxToRem(15);
-  
+
   input[type="checkbox"] {
     margin-right: pxToRem(8);
   }
@@ -100,5 +99,84 @@
   p {
     margin: pxToRem(5) 0;
     font-size: pxToRem(14);
+  }
+}
+
+.transactions-container {
+  .wallet-info, .transaction {
+    background-color: var(--card-color);
+    border-radius: pxToRem(5);
+    padding: pxToRem(15);
+    margin-bottom: pxToRem(15);
+  }
+
+  .wallet-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    p {
+      margin: pxToRem(5) 0;
+      font-size: pxToRem(16);
+    }
+  }
+
+  h3 {
+    margin-top: pxToRem(20);
+    margin-bottom: pxToRem(10);
+  }
+
+  .transaction {
+    h4 {
+      margin-bottom: pxToRem(10);
+    }
+
+    p {
+      margin: pxToRem(5) 0;
+      font-size: pxToRem(14);
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: pxToRem(5);
+    }
+  }
+
+  .pool-transaction {
+    border-left: pxToRem(4) solid var(--accent-color);
+  }
+
+  .confirmed-transaction {
+    border-left: pxToRem(4) solid var(--success-color);
+  }
+}
+
+.blocks-navigation, .transactions-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: pxToRem(20);
+
+  button {
+    background-color: var(--secondary-color);
+    color: var(--font-color);
+    border: none;
+    padding: pxToRem(8) pxToRem(16);
+    border-radius: pxToRem(4);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: var(--accent-color);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
   }
 }

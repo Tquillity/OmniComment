@@ -1,4 +1,3 @@
-// Blockchain.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -8,20 +7,25 @@ import { useUser } from '../hooks/useUser';
 
 const Blockchain = () => {
   const [blockchainData, setBlockchainData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [blockchainError, setBlockchainError] = useState(null);
   const [miningStatus, setMiningStatus] = useState('');
   const [transactions, setTransactions] = useState([]);
+  const [transactionError, setTransactionError] = useState(null);
   const [puzzle, setPuzzle] = useState(null);
   const [userAnswer, setUserAnswer] = useState('');
   const { user } = useUser();
   const [puzzleEnabled, setPuzzleEnabled] = useState(true);
   const [displayBlocks, setDisplayBlocks] = useState([]);
   const [currentPosition, setCurrentPosition] = useState(0);
+  const [walletInfo, setWalletInfo] = useState(null);
+  const [transactionPool, setTransactionPool] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchBlockchainData();
     fetchTransactions();
+    fetchWalletInfo();
+    fetchTransactionPool();
   }, []);
 
   const fetchData = asyncHandler(async (url) => {
@@ -33,15 +37,46 @@ const Blockchain = () => {
   });
 
   const fetchBlockchainData = async () => {
-    const result = await fetchData('http://localhost:5001/api/v1/blockchain');
-    if (result.error) {
-      setError('Error fetching blockchain data');
-    } else {
+    try {
+      const result = await fetchData('http://localhost:5001/api/v1/blockchain');
       setBlockchainData(result);
+      setDisplayBlocks(result);
+      setCurrentPosition(result.length - 3 >= 0 ? result.length - 3 : 0);
+      setBlockchainError(null);
+    } catch (error) {
+      setBlockchainError('Error fetching blockchain data');
     }
-    setLoading(false);
-    setDisplayBlocks(result);
-    setCurrentPosition(result.length - 3 >= 0 ? result.length - 3 : 0);
+  };
+
+  const fetchTransactions = async () => {
+    try {
+      const result = await fetchData('http://localhost:5001/api/v1/wallet/transactions/all');
+      setTransactions(result);
+      setTransactionError(null);
+    } catch (error) {
+      setTransactionError('Error fetching transactions');
+    }
+  };
+
+  const fetchWalletInfo = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get('http://localhost:5001/api/v1/wallet/info');
+      setWalletInfo(response.data.data);
+    } catch (error) {
+      setTransactionError('Error fetching wallet information: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const fetchTransactionPool = async () => {
+    try {
+      const response = await axios.get('http://localhost:5001/api/v1/wallet/transactions');
+      setTransactionPool(response.data.data);
+    } catch (error) {
+      setTransactionError('Error fetching transaction pool');
+    }
   };
 
   const scrollLeft = () => {
@@ -52,15 +87,6 @@ const Blockchain = () => {
     setCurrentPosition(prev => Math.min(prev + 1, displayBlocks.length - 3));
   };
 
-  const fetchTransactions = async () => {
-    const result = await fetchData('http://localhost:5001/api/v1/wallet/transactions/all');
-    if (result.error) {
-      setError('Error fetching transactions');
-    } else {
-      setTransactions(result);
-    }
-  };
-
   const mineBlock = asyncHandler(async () => {
     const response = await axios.post('http://localhost:5001/api/v1/block/mine', {
       minerPublicKey: user.walletPublicKey
@@ -68,6 +94,9 @@ const Blockchain = () => {
     if (response.data.success) {
       setMiningStatus('Block mined successfully');
       await fetchBlockchainData();
+      await fetchTransactions();
+      await fetchWalletInfo();
+      await fetchTransactionPool();
     } else {
       throw new Error('Failed to mine Block.');
     }
@@ -115,8 +144,7 @@ const Blockchain = () => {
   };
 
   const renderBlockchainData = () => {
-    if (loading) return <p>Loading blockchain data...</p>;
-    if (error) return <p>{error}</p>;
+    if (blockchainError) return <p>{blockchainError}</p>;
     if (blockchainData.length === 0) return <p>No blockchain data found</p>;
 
     return blockchainData.map((block, index) => (
@@ -136,27 +164,71 @@ const Blockchain = () => {
   };
 
   const renderTransactions = () => {
-    if (transactions.length === 0) return <p>No transactions found</p>;
-
-    return transactions.map((transaction, index) => (
-      <div key={index} className="transaction">
-        <h3>Transaction {index + 1}</h3>
-        <p>ID: {transaction.id}</p>
-        <p>From: {transaction.inputMap.address}</p>
-        <div>
-          <h4>Recipients:</h4>
-          <ul>
-            {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
-              <li key={i}>
-                <p>To: {recipient}</p>
-                <p>Amount: {amount}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+    if (transactionError) return <p>{transactionError}</p>;
+    
+    return (
+      <div className="transactions-container">
+        <h3>Wallet Information</h3>
+        {walletInfo ? (
+          <div className="wallet-info">
+            <p>Address: {walletInfo.address}</p>
+            <p>Balance: {walletInfo.balance}</p>
+          </div>
+        ) : (
+          <p>Loading wallet information...</p>
+        )}
+  
+        <h3>Transaction Pool</h3>
+        {transactionPool.length > 0 ? (
+          transactionPool.map((transaction, index) => (
+            <div key={index} className="transaction pool-transaction">
+              <h4>Transaction {index + 1}</h4>
+              <p>ID: {transaction.id}</p>
+              <p>From: {transaction.inputMap.address}</p>
+              <div>
+                <h5>Recipients:</h5>
+                <ul>
+                  {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
+                    <li key={i}>
+                      <p>To: {recipient}</p>
+                      <p>Amount: {amount}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+            </div>
+          ))
+        ) : (
+          <p>No transactions in the pool</p>
+        )}
+  
+        <h3>Confirmed Transactions</h3>
+        {transactions.length > 0 ? (
+          transactions.map((transaction, index) => (
+            <div key={index} className="transaction confirmed-transaction">
+              <h4>Transaction {index + 1}</h4>
+              <p>ID: {transaction.id}</p>
+              <p>From: {transaction.inputMap.address}</p>
+              <div>
+                <h5>Recipients:</h5>
+                <ul>
+                  {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
+                    <li key={i}>
+                      <p>To: {recipient}</p>
+                      <p>Amount: {amount}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+            </div>
+          ))
+        ) : (
+          <p>No confirmed transactions</p>
+        )}
       </div>
-    ));
+    );
   };
 
   return (
