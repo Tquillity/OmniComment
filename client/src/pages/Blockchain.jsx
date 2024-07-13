@@ -58,17 +58,17 @@ const Blockchain = () => {
     }
   };
 
-  const fetchWalletInfo = async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get('http://localhost:5001/api/v1/wallet/info');
-      setWalletInfo(response.data.data);
-    } catch (error) {
-      setTransactionError('Error fetching wallet information: ' + error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+const fetchWalletInfo = async () => {
+  setIsLoading(true);
+  try {
+    const response = await axios.get('http://localhost:5001/api/v1/wallet/info');
+    setWalletInfo(response.data.data);
+  } catch (error) {
+    setTransactionError('Error fetching wallet information: ' + error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
   
   const fetchTransactionPool = async () => {
     try {
@@ -163,73 +163,88 @@ const Blockchain = () => {
     ));
   };
 
-  const renderTransactions = () => {
-    if (transactionError) return <p>{transactionError}</p>;
-    
-    return (
-      <div className="transactions-container">
-        <h3>Wallet Information</h3>
-        {walletInfo ? (
-          <div className="wallet-info">
-            <p className="truncate">Address: {walletInfo.address}</p>
-            <p>Balance: {walletInfo.balance}</p>
-          </div>
-        ) : (
-          <p>Loading wallet information...</p>
-        )}
+ const renderTransactions = () => {
+  if (transactionError) return <p>{transactionError}</p>;
   
-        <h3>Transaction Pool</h3>
-        {transactionPool.length > 0 ? (
-          transactionPool.map((transaction, index) => (
-            <div key={index} className="transaction pool-transaction">
-              <h4>Transaction {index + 1}</h4>
-              <p className="truncate">ID: {transaction.id}</p>
-              <p className="truncate">From: {transaction.inputMap.address}</p>
-              <div>
-                <h5>Recipients:</h5>
-                <ul>
-                  {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
-                    <li key={i}>
-                      <p className="truncate">To: {recipient}</p>
-                      <p>Amount: {amount}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
-            </div>
-          ))
-        ) : (
-          <p>No transactions in the pool</p>
-        )}
-  
-        <h3>Confirmed Transactions</h3>
-        {transactions.length > 0 ? (
-          transactions.map((transaction, index) => (
+  return (
+    <div className="transactions-container">
+      <h3>Wallet Information</h3>
+      {walletInfo ? (
+        <div className="wallet-info">
+          <p className="truncate">Address: {walletInfo.address}</p>
+          <p>Balance: {walletInfo.balance}</p>
+        </div>
+      ) : (
+        <p>Loading wallet information...</p>
+      )}
+
+<h3>Confirmed Transactions</h3>
+      {transactions.length > 0 ? (
+        transactions.map((transaction, index) => {
+          const transactionNumber = transactions.length - index;
+          const sender = transaction.inputMap.address;
+          const [recipient, amount] = Object.entries(transaction.outputMap)[0];
+          const senderBalance = transaction.inputMap.amount - amount;
+
+          return (
             <div key={index} className="transaction confirmed-transaction">
-              <h4>Transaction {index + 1}</h4>
+              <h4>Transaction {transactionNumber}</h4>
               <p className="truncate">ID: {transaction.id}</p>
-              <p className="truncate">From: {transaction.inputMap.address}</p>
+              <p className="truncate">From: {sender}</p>
+              <p>Sent Amount: {amount}</p>
+              <p>Balance: {senderBalance}</p>
               <div>
                 <h5>Recipients:</h5>
                 <ul>
-                  {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
-                    <li key={i}>
-                      <p className="truncate">To: {recipient}</p>
-                      <p>Amount: {amount}</p>
-                    </li>
-                  ))}
+                  <li>
+                    <p className="truncate">To: {recipient}</p>
+                    <p>Received Amount: {amount}</p>
+                  </li>
                 </ul>
               </div>
               <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
             </div>
-          ))
-        ) : (
-          <p>No confirmed transactions</p>
-        )}
-      </div>
-    );
-  };
+          );
+        })
+      ) : (
+        <p>No confirmed transactions</p>
+      )}
+
+      <h3>Transaction Pool</h3>
+      {transactionPool.length > 0 ? (
+        transactionPool.map((transaction, index) => {
+          const transactionNumber = transactionPool.length - index;
+          const sender = transaction.inputMap.address;
+          const [recipient, amount] = Object.entries(transaction.outputMap)[0];
+          const senderBalance = transaction.inputMap.amount - amount;
+
+          return (
+            <div key={index} className="transaction pool-transaction">
+              <h4>Transaction {transactionNumber}</h4>
+              <p className="truncate">ID: {transaction.id}</p>
+              <p className="truncate">From: {sender}</p>
+              <p>Sent Amount: {amount}</p>
+              <p>Balance: {senderBalance}</p>
+              <div>
+                <h5>Recipients:</h5>
+                <ul>
+                  <li>
+                    <p className="truncate">To: {recipient}</p>
+                    <p>Received Amount: {amount}</p>
+                    <p>Balance: {transaction.outputMap[recipient]}</p>
+                  </li>
+                </ul>
+              </div>
+              <p>Timestamp: {new Date(transaction.inputMap.timestamp).toLocaleString()}</p>
+            </div>
+          );
+        })
+      ) : (
+        <p>No transactions in the pool</p>
+      )}
+    </div>
+  );
+};
   
   return (
     <div className="blockchain-container">
