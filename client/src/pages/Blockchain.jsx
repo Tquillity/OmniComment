@@ -131,7 +131,7 @@ const Blockchain = () => {
     return displayBlocks.slice(currentPosition, currentPosition + 3).map((block, index) => (
       <div key={`${block.hash}-${index}`} className="recent-block">
         <h3>Block {currentPosition + index + 1}</h3>
-        <p>Hash: {block.hash.substring(0, 10)}...</p>
+        <p className="truncate">Hash: {block.hash.substring(0, 10)}...</p>
         <p>Timestamp: {new Date(block.timestamp).toLocaleString()}</p>
         <p>Nonce: {block.nonce}</p>
         <p>Difficulty: {block.difficulty}</p>
@@ -146,12 +146,12 @@ const Blockchain = () => {
   const renderBlockchainData = () => {
     if (blockchainError) return <p>{blockchainError}</p>;
     if (blockchainData.length === 0) return <p>No blockchain data found</p>;
-
+  
     return blockchainData.map((block, index) => (
       <div key={index} className="block">
         <h3>Block {index}</h3>
-        <p>Hash: {block.hash}</p>
-        <p>Previous Hash: {block.lastHash}</p>
+        <p className="truncate">Hash: {block.hash}</p>
+        <p className="truncate">Previous Hash: {block.lastHash}</p>
         <p>Timestamp: {new Date(block.timestamp).toLocaleString()}</p>
         <p>Nonce: {block.nonce}</p>
         <p>Difficulty: {block.difficulty}</p>
@@ -171,7 +171,7 @@ const Blockchain = () => {
         <h3>Wallet Information</h3>
         {walletInfo ? (
           <div className="wallet-info">
-            <p>Address: {walletInfo.address}</p>
+            <p className="truncate">Address: {walletInfo.address}</p>
             <p>Balance: {walletInfo.balance}</p>
           </div>
         ) : (
@@ -183,14 +183,14 @@ const Blockchain = () => {
           transactionPool.map((transaction, index) => (
             <div key={index} className="transaction pool-transaction">
               <h4>Transaction {index + 1}</h4>
-              <p>ID: {transaction.id}</p>
-              <p>From: {transaction.inputMap.address}</p>
+              <p className="truncate">ID: {transaction.id}</p>
+              <p className="truncate">From: {transaction.inputMap.address}</p>
               <div>
                 <h5>Recipients:</h5>
                 <ul>
                   {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
                     <li key={i}>
-                      <p>To: {recipient}</p>
+                      <p className="truncate">To: {recipient}</p>
                       <p>Amount: {amount}</p>
                     </li>
                   ))}
@@ -208,14 +208,14 @@ const Blockchain = () => {
           transactions.map((transaction, index) => (
             <div key={index} className="transaction confirmed-transaction">
               <h4>Transaction {index + 1}</h4>
-              <p>ID: {transaction.id}</p>
-              <p>From: {transaction.inputMap.address}</p>
+              <p className="truncate">ID: {transaction.id}</p>
+              <p className="truncate">From: {transaction.inputMap.address}</p>
               <div>
                 <h5>Recipients:</h5>
                 <ul>
                   {Object.entries(transaction.outputMap).map(([recipient, amount], i) => (
                     <li key={i}>
-                      <p>To: {recipient}</p>
+                      <p className="truncate">To: {recipient}</p>
                       <p>Amount: {amount}</p>
                     </li>
                   ))}
@@ -230,7 +230,7 @@ const Blockchain = () => {
       </div>
     );
   };
-
+  
   return (
     <div className="blockchain-container">
       <div className="blockchain-page">
