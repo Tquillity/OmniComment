@@ -1,4 +1,13 @@
+.blockchain-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+
 .blockchain-page {
+  max-width: pxToRem(1200);
+  width: 100%;
   padding: pxToRem(20);
 
   h1 {
@@ -60,5 +69,36 @@
   
   input[type="checkbox"] {
     margin-right: pxToRem(8);
+  }
+}
+
+.recent-blocks-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: pxToRem(20);
+  overflow: hidden;
+}
+
+.recent-block {
+  background-color: var(--card-color);
+  border-radius: pxToRem(5);
+  padding: pxToRem(15);
+  margin-left: pxToRem(15);
+  margin-top: pxToRem(15);
+  flex: 0 0 calc(33.333% - pxToRem(10));
+  max-width: calc(33.333% - pxToRem(10));
+  transition: transform 0.3s ease-in-out;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  h3 {
+    margin-bottom: pxToRem(10);
+  }
+
+  p {
+    margin: pxToRem(5) 0;
+    font-size: pxToRem(14);
   }
 }

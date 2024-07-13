@@ -16,6 +16,8 @@ const Blockchain = () => {
   const [userAnswer, setUserAnswer] = useState('');
   const { user } = useUser();
   const [puzzleEnabled, setPuzzleEnabled] = useState(true);
+  const [displayBlocks, setDisplayBlocks] = useState([]);
+  const [currentPosition, setCurrentPosition] = useState(0);
 
   useEffect(() => {
     fetchBlockchainData();
@@ -38,6 +40,16 @@ const Blockchain = () => {
       setBlockchainData(result);
     }
     setLoading(false);
+    setDisplayBlocks(result);
+    setCurrentPosition(result.length - 3 >= 0 ? result.length - 3 : 0);
+  };
+
+  const scrollLeft = () => {
+    setCurrentPosition(prev => Math.max(prev - 1, 0));
+  };
+
+  const scrollRight = () => {
+    setCurrentPosition(prev => Math.min(prev + 1, displayBlocks.length - 3));
   };
 
   const fetchTransactions = async () => {
@@ -80,6 +92,26 @@ const Blockchain = () => {
     }
     setPuzzle(null);
     setUserAnswer('');
+  };
+
+  const renderRecentBlocks = () => {
+    if (displayBlocks.length === 0) {
+      return <p>No blocks mined yet.</p>;
+    }
+  
+    return displayBlocks.slice(currentPosition, currentPosition + 3).map((block, index) => (
+      <div key={`${block.hash}-${index}`} className="recent-block">
+        <h3>Block {currentPosition + index + 1}</h3>
+        <p>Hash: {block.hash.substring(0, 10)}...</p>
+        <p>Timestamp: {new Date(block.timestamp).toLocaleString()}</p>
+        <p>Nonce: {block.nonce}</p>
+        <p>Difficulty: {block.difficulty}</p>
+        <details>
+          <summary>Data ({block.data.length} items)</summary>
+          <pre>{JSON.stringify(block.data, null, 2)}</pre>
+        </details>
+      </div>
+    ));
   };
 
   const renderBlockchainData = () => {
@@ -128,62 +160,76 @@ const Blockchain = () => {
   };
 
   return (
-    <div className="blockchain-page">
-      <h1>Blockchain</h1>
-      <Tabs>
-        <TabList>
-          <Tab>Fetch Blockchain</Tab>
-          <Tab>Mine Block</Tab>
-          <Tab>Transactions</Tab>
-          <Tab>Coming Soon</Tab>
-        </TabList>
-      
-        <TabPanel>
-          <h2>Fetching Blockchain</h2>
-          {renderBlockchainData()}
-        </TabPanel>
-        <TabPanel>
-          <h2>Mine Block</h2>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={puzzleEnabled}
-                onChange={(e) => setPuzzleEnabled(e.target.checked)}
-              />
-              Enable Mining Puzzle
-            </label>
-          </div>
-          {puzzleEnabled ? (
-            puzzle ? (
-              <div>
-                <p>Solve this puzzle to mine the block: {puzzle.question}</p>
+    <div className="blockchain-container">
+      <div className="blockchain-page">
+        <h1>Blockchain</h1>
+        <Tabs>
+          <TabList>
+            <Tab>Fetch Blockchain</Tab>
+            <Tab>Mine Block</Tab>
+            <Tab>Transactions</Tab>
+            <Tab>Coming Soon</Tab>
+          </TabList>
+        
+          <TabPanel>
+            <h2>Fetching Blockchain</h2>
+            {renderBlockchainData()}
+          </TabPanel>
+          <TabPanel>
+            <h2>Mine Block</h2>
+            <div>
+              <label className="puzzle-toggle">
                 <input
-                  type="text"
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="Enter your answer"
+                  type="checkbox"
+                  checked={puzzleEnabled}
+                  onChange={(e) => setPuzzleEnabled(e.target.checked)}
                 />
-                <button onClick={submitPuzzleAnswer}>Submit Answer</button>
-              </div>
+                Enable Mining Puzzle
+              </label>
+            </div>
+            {puzzleEnabled ? (
+              puzzle ? (
+                <div>
+                  <p>Solve this puzzle to mine the block: {puzzle.question}</p>
+                  <input
+                    type="text"
+                    value={userAnswer}
+                    onChange={(e) => setUserAnswer(e.target.value)}
+                    placeholder="Enter your answer"
+                  />
+                  <button onClick={submitPuzzleAnswer}>Submit Answer</button>
+                </div>
+              ) : (
+                <button onClick={handleMineBlock}>Mine Block</button>
+              )
             ) : (
-              <button onClick={handleMineBlock}>Mine Block</button>
-            )
-          ) : (
-            <button onClick={mineBlock}>Mine Block</button>
-          )}
-          <p>{miningStatus}</p>
-        </TabPanel>
-        <TabPanel>
-          <h2>Transactions</h2>
-          {renderTransactions()}
-        </TabPanel>
-        <TabPanel>
-          <h2>More Features Coming Soon</h2>
-          <p>We're currently working on something awesome. Stay tuned!</p>
-        </TabPanel>
-      </Tabs>
-    </div>
+              <button onClick={mineBlock}>Mine Block</button>
+            )}
+            <p>{miningStatus}</p>
+            <h3>Recent Blocks</h3>           
+            <div className="blocks-navigation">
+              <button onClick={scrollLeft} disabled={currentPosition === 0}>
+                &lt; Previous
+              </button>
+              <div className="recent-blocks-container">
+                {renderRecentBlocks()}
+              </div>
+              <button onClick={scrollRight} disabled={currentPosition >= displayBlocks.length - 3}>
+                Next &gt;
+              </button>
+            </div>
+          </TabPanel>
+          <TabPanel>
+            <h2>Transactions</h2>
+            {renderTransactions()}
+          </TabPanel>
+          <TabPanel>
+            <h2>More Features Coming Soon</h2>
+            <p>We're currently working on something awesome. Stay tuned!</p>
+          </TabPanel>
+        </Tabs>
+      </div>
+    </div> 
   );
 };
 
