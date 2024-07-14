@@ -4,6 +4,7 @@ import Blockchain from '../models/Blockchain.mjs';
 import { createHash } from '../utilities/crypto-lib.mjs';
 import Wallet from '../models/Wallet.mjs';
 import Transaction from '../models/Transaction.mjs';
+import User from '../models/UserModel.mjs';
 
 describe('Blockchain', () => {
   let blockchain, blockchain2, originalChain;
@@ -174,80 +175,68 @@ describe('Blockchain', () => {
 
   // Tests for the validateTransactionData method
   describe('Validate Transaction data', () => {
-  let transaction, transactionReward, wallet;
-
-  // Before each test, create a new wallet and transactions
-  beforeEach(() => {
-    wallet = new Wallet(); // Initialize a new wallet
-    // Create a regular transaction from the wallet
-    transaction = wallet.createTransaction({ recipient: 'Mikael', amount: 7 });
-    // Create a mining reward transaction for the wallet
-    transactionReward = Transaction.transactionReward({ miner: wallet });
-  });
-
-  // Tests for scenarios where the transaction data is valid
-  describe('and the transaction data is valid', () => {
-    it('should return true', () => {
-      // Add a new block with valid transaction data to blockchain2
-      blockchain2.addBlock({ data: [transaction, transactionReward] });
-
-      // Validate the transaction data in blockchain2
-      expect(
-        blockchain.validateTransactionData({ chain: blockchain2.chain })
-      ).toBe(true);
+    let transaction, transactionReward, wallet, blockchain2;
+  
+    beforeEach(async () => {
+      wallet = new Wallet();
+      blockchain2 = new Blockchain();
+      
+      // Mock the User.findOne method
+      vi.spyOn(User, 'findOne').mockResolvedValue({ walletPublicKey: 'mock-reward-public-key' });
+  
+      // Mock the blockchain methods that interact with the database
+      vi.spyOn(blockchain2, 'saveBlock').mockResolvedValue();
+      
+      transaction = wallet.createTransaction({ recipient: 'Mikael', amount: 7 });
+      transactionReward = await Transaction.transactionReward({ miner: wallet });
     });
-  });
-
-  // Tests for scenarios where there are multiple rewards in a block
-  describe('and there are multiple rewards', () => {
-    it('should return false', () => {
-      // Add a new block with multiple reward transactions to blockchain2
-      blockchain2.addBlock({
-        data: [transaction, transactionReward, transactionReward],
+  
+    describe('and the transaction data is valid', () => {
+      it('should return true', async () => {
+        await blockchain2.addBlock({ data: [transaction, transactionReward] });
+  
+        const result = await blockchain.validateTransactionData({ chain: blockchain2.chain });
+        expect(result).toBe(true);
       });
-
-      // Validate the transaction data in blockchain2
-      expect(
-        blockchain.validateTransactionData({ chain: blockchain2.chain })
-      ).toBe(false);
     });
-  });
-
-  // Tests for scenarios where a transaction's outputMap is incorrectly formatted
-  describe('and the transaction data consists of at least one incorrectly formatted outputMap', () => {
-    it('should return false', () => {
-      // Changed transaction outputMap to make it invalid
-      transaction.outputMap[wallet.publicKey] = 555555;
-
-      // Add a new block with the tampered transaction to blockchain2
-      blockchain2.addBlock({ data: [transaction, transactionReward] });
-
-      // Validate the transaction data in blockchain2
-      expect(
-        blockchain.validateTransactionData({ chain: blockchain2.chain })
-      ).toBe(false);
-    });
-  });
-
-  // Tests for scenarios where a block contains identical transactions
-  describe('and a block contains identical transactions', () => {
-    it('should return false', () => {
-      // Add a new block with identical transactions to blockchain2
-      blockchain2.addBlock({
-        data: [
-          transaction,
-          transaction,
-          transaction,
-          transaction,
-          transactionReward,
-        ],
+  
+    describe('and there are multiple rewards', () => {
+      it('should return false', async () => {
+        await blockchain2.addBlock({
+          data: [transaction, transactionReward, transactionReward],
+        });
+  
+        const result = await blockchain.validateTransactionData({ chain: blockchain2.chain });
+        expect(result).toBe(false);
       });
-
-      // Validate the transaction data in blockchain2
-      expect(
-        blockchain.validateTransactionData({ chain: blockchain2.chain })
-      ).toBe(false);
     });
-  });
+  
+    describe('and the transaction data consists of at least one incorrectly formatted outputMap', () => {
+      it('should return false', async () => {
+        transaction.outputMap[wallet.publicKey] = 555555;
+  
+        await blockchain2.addBlock({ data: [transaction, transactionReward] });
+  
+        const result = await blockchain.validateTransactionData({ chain: blockchain2.chain });
+        expect(result).toBe(false);
+      });
+    });
+  
+    describe('and a block contains identical transactions', () => {
+      it('should return false', async () => {
+        await blockchain2.addBlock({
+          data: [
+            transaction,
+            transaction,
+            transaction,
+            transaction,
+            transactionReward,
+          ],
+        });
+  
+        const result = await blockchain.validateTransactionData({ chain: blockchain2.chain });
+        expect(result).toBe(false);
+      });
+    });
   });
 });

@@ -1,3 +1,4 @@
+// CommentModel.mjs
 import mongoose from "mongoose";
 
 const commentSchema = new mongoose.Schema({
@@ -62,7 +63,6 @@ const commentSchema = new mongoose.Schema({
   },
 });
 
-// Add an index to improve query performance
 commentSchema.index({ title: 1, createdAt: -1 });
 
 export default mongoose.model('Comment', commentSchema);

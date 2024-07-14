@@ -1,3 +1,4 @@
+// Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -9,7 +10,7 @@ const initialState = {
   email: '',
   password: '',
   confirmPassword: '',
-  role: 'user', // Default role
+  role: 'user',
 };
 
 const Register = () => {

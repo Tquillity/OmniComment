@@ -1,3 +1,4 @@
+// comments-routes.mjs
 import express from 'express';
 import {
   addComment,

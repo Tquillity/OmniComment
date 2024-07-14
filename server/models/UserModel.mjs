@@ -1,5 +1,4 @@
 // userModel.mjs
-
 import mongoose from 'mongoose';
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
@@ -72,14 +71,12 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Create middleware for mongoose to hash the password before saving it to the database
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
   }
   this.password = await bcrypt.hash(this.password, 12);
 
-  // Generate wallet keys if they don't exist
   if (!this.walletPublicKey || !this.walletPrivateKey) {
     const keyPair = ellipticHash.genKeyPair();
     this.walletPublicKey = keyPair.getPublic('hex');
@@ -88,7 +85,6 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Method useable on schema instances
 userSchema.methods.validatePassword = async function (passwordToCheck) {
   return await bcrypt.compare(passwordToCheck, this.password);
 };

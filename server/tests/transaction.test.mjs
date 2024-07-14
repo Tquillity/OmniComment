@@ -1,8 +1,19 @@
-import { it, describe, expect, beforeEach } from 'vitest';
+// transaction.test.mjs
+import { it, describe, expect, beforeEach, vi } from 'vitest';
 import Transaction from '../models/Transaction.mjs';
 import Wallet from '../models/Wallet.mjs';
 import { verifySignature } from '../utilities/crypto-lib.mjs';
 import { MINING_REWARD, REWARD_ADDRESS } from '../config/settings.mjs';
+import User from '../models/UserModel.mjs';
+
+// At the top of your test file
+vi.mock('../models/UserModel.mjs', () => ({
+  default: {
+    findOne: vi.fn().mockResolvedValue({
+      walletPublicKey: 'mocked-public-key',
+    }),
+  },
+}));
 
 describe('Transaction', () => {
   let transaction, sender, recipient, amount; // variables needed in test
@@ -166,14 +177,15 @@ describe('Transaction', () => {
     let transactionReward, miner;
 
     // Before each test, initiate a miner wallet and a reward transaction
-    beforeEach(() => {
+    beforeEach(async () => {
       miner = new Wallet();
-      transactionReward = Transaction.transactionReward({ miner });
+      transactionReward = await Transaction.transactionReward({ miner });
     });
 
     // Test to check if the reward transaction contains the miner's address
-    it('should create a reward transaction with the address of the miner', () => {
-      expect(transactionReward.inputMap).toEqual(REWARD_ADDRESS);
+    it('should create a reward transaction with the address of the reward user', async () => {
+      const rewardUser = await User.findOne({ role: 'reward' });
+      expect(transactionReward.inputMap.address).toEqual('mocked-public-key');
     });
 
     //Test to check if hte reward transaction contains the correct mining reward

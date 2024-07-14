@@ -1,3 +1,4 @@
+// auth-controller.mjs
 import User from '../models/UserModel.mjs';
 import Wallet from '../models/Wallet.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
@@ -39,14 +40,12 @@ export const login = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('Please provide an email and password', 400));
   }
 
-  // question to mongoose to return the email
-  const user = await User.findOne({ email }).select('+password'); // PROJECT the password field
+  const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
     return next(new ErrorResponse('Invalid credentials', 401));
   }
 
-  // Check if the password matches
   const isCorrect = await user.validatePassword(password);
 
   if (!isCorrect) {
@@ -127,10 +126,9 @@ export const forgotPassword = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse(`No user with the email ${email} found`, 400));
   }
 
-  const resetToken = user.createResetPasswordToken();
+  const resetToken = user.resetPasswordToken();
   await user.save ({ validateBeforeSave: false });
 
-  // Create reset URL
   const resetURL = `${req.protocol}://${req.get('host')}/api/v1/auth/resetpassword/${resetToken}`;
   
   res.status(200).json({
@@ -154,8 +152,8 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
   let user = await User.findOne({ resetPasswordToken: token});
 
   user.password = password;
-  user.resetPasswordToken = undefined;        // Nullifies the token
-  user.resetPasswordTokenExpire = undefined;  // Nullifies the expiration date
+  user.resetPasswordToken = undefined;
+  user.resetPasswordTokenExpire = undefined;
 
   await user.save();
 

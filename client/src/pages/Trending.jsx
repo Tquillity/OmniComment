@@ -1,5 +1,4 @@
-// WorkInProgress.jsx
-
+// Trending.jsx
 import React from 'react';
 
 const Trending = () => {

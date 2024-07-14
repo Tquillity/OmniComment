@@ -1,3 +1,4 @@
+// settings.mjs
 export const MINE_RATE = 30000;
 export const INITIAL_BALANCE = 1000;
 export const MINING_REWARD = 50;

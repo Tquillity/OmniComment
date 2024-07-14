@@ -1,4 +1,4 @@
-
+// block.test.mjs
 import hexToBinary from 'hex-to-binary';
 import { it, describe, expect, beforeEach } from 'vitest';
 import { createHash } from '../utilities/crypto-lib.mjs';

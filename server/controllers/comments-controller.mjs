@@ -1,3 +1,4 @@
+// comments-controller.mjs
 import { asyncHandler } from '../middleware/asyncHandler.mjs';
 import ErrorResponse from '../models/ErrorResponseModel.mjs';
 import Comment from '../models/CommentsModel.mjs';

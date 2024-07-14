@@ -1,3 +1,4 @@
+// auth-routes.mjs
 import express from 'express';
 import {
   register,
@@ -12,7 +13,6 @@ import { protect } from '../middleware/authorization.mjs';
 
 const router = express.Router();
 
-//router.route('/register').post(register); Alternate way to write the below line
 router.post('/register', register);
 router.post('/login', login);
 router.post('/forgotpassword', forgotPassword);

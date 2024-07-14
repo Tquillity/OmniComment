@@ -1,3 +1,4 @@
+// Blockchain.mjs
 import { MINING_REWARD } from '../config/settings.mjs';
 import { createHash } from '../utilities/crypto-lib.mjs';
 import Block from './Block.mjs';
@@ -20,7 +21,6 @@ export default class Blockchain {
     }
   }
 
-  // Function to add a new block to the chain
   async addBlock({ data }) {
     const newBlock = Block.mineBlock({
       lastBlock: this.chain.at(-1),
@@ -43,47 +43,36 @@ export default class Blockchain {
     await BlockModel.create(blockData);
   }
 
-  // Instance method to replace the current chain with a new chain
+  
   replaceChain(chain, shouldValidate, callback) { 
-    // Check if the new chain is longer than the current chain
     if (chain.length <= this.chain.length) return;
     
-    // Validate the new chain
     if (!Blockchain.validateChain(chain)) return;
 
-    // Validate transaction data if specified
     if (shouldValidate && !this.validateTransactionData({ chain })) return;
 
-    // Execute callback if provided
     if (callback) callback();
 
-    // Replace the current chain with the new chain
     this.chain = chain;
   }
 
-  // Instance method to validate transaction data in the chain
   async validateTransactionData({ chain }) {
     const rewardUser = await User.findOne({ role: 'reward' });
     if (!rewardUser) {
       throw new Error('Reward user not found');
     }
 
-    // Iterate through each block in the chain starting from the second block
     for(let i = 1; i < chain.length; i++) {
       const block = chain[i];
       const transactionSet = new Set();
       let counter = 0;
 
-      // Iterate through each transaction in the block
       for (let transaction of block.data) {
-        // Check if the transaction is a reward transaction
         if (transaction.inputMap.address === rewardUser.walletPublicKey) {
           counter++;
 
-          // There should be only one reward transaction per block
           if (counter > 1) return false;
 
-          // The reward transaction should have the correct mining reward amount
           if (Object.values(transaction.outputMap)[0] !== MINING_REWARD) 
             return false;
         } else {
@@ -91,7 +80,6 @@ export default class Blockchain {
             return false;
           }
 
-          // Ensure each transaction is unique in the block
           if (transactionSet.has(transaction)) {
             return false;
           } else {
@@ -101,7 +89,6 @@ export default class Blockchain {
       }
     }
 
-    // Return true if all transactions are valid
     return true;
   }
 
