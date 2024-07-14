@@ -1,29 +1,24 @@
+//pubnub-server.mjs
 import PubNub from 'pubnub';
 
-// Defining the channels used for communication
 const CHANNELS = {
   DEMO: 'DEMO',
   BLOCKCHAIN: 'BLOCKCHAIN',
   TRANSACTION: 'TRANSACTION',
 };
 
-// Defining and exporting the PubNubServer class
 export default class PubNubServer {
-  // Constructor to initialize the PubNubServer with necessary dependencies and credentials
   constructor ({ blockchain, transactionPool, wallet, credentials }) {
     this.blockchain = blockchain;
-    //this.transactionPool = transactionPool;
-    //this.wallet = wallet;
+    this.transactionPool = transactionPool;
+    this.wallet = wallet;
     this.pubnub = new PubNub(credentials);
 
-    // Subscribing to the defined channels
     this.pubnub.subscribe({ channels: Object.values(CHANNELS) });
     
-    // Listener to handle incoming messages
     this.pubnub.addListener(this.listener());
   }
 
-  // Method to broadcast the current state of the blockchain
   broadcast() {
     this.publish({
       channel: CHANNELS.BLOCKCHAIN,
@@ -31,7 +26,6 @@ export default class PubNubServer {
     })
   }
 
-  // Method to publish a specific transaction
   broadcastTransaction(transaction) {
     this.publish({
       channel: CHANNELS.TRANSACTION,
@@ -39,7 +33,6 @@ export default class PubNubServer {
     });
   }
 
-  // Listener method to handle incoming messages
   listener() {
     return {
       message: (msgObject) => {
@@ -50,7 +43,6 @@ export default class PubNubServer {
           `Message received on Channel: ${channel}. Message: ${message}`
         );
 
-        // Handle messages based on the channel they where received on
         switch (channel) {
           case CHANNELS.BLOCKCHAIN:
             this.blockchain.replaceChain(msg, true, () => {
@@ -67,13 +59,12 @@ export default class PubNubServer {
             }
             break;
           default:
-            return; // Ignore messages from unknown/other channels
+            return;
         }
       },
     };
   }
 
-  // Method to publiosh messages to a specific channel
   publish({ channel, message }) {
     this.pubnub.publish({ channel, message })
   }
