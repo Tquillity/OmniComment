@@ -1,3 +1,4 @@
+// Register.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -9,6 +10,7 @@ const initialState = {
   email: '',
   password: '',
   confirmPassword: '',
+  role: 'user',
 };
 
 const Register = () => {
@@ -17,7 +19,7 @@ const Register = () => {
     isOpen: false,
     title: '',
     message: '',
-    isError: false
+    isError: false,
   });
   const navigate = useNavigate();
 
@@ -26,7 +28,7 @@ const Register = () => {
       isOpen: true,
       title,
       message,
-      isError
+      isError,
     });
   };
 
@@ -46,7 +48,7 @@ const Register = () => {
   };
 
   const handleModalClose = () => {
-    setModalState(prev => ({ ...prev, isOpen: false }));
+    setModalState((prev) => ({ ...prev, isOpen: false }));
     if (!modalState.isError) {
       navigate('/login');
     }
@@ -71,6 +73,21 @@ const Register = () => {
               />
             </div>
           ))}
+          <div className="form-group">
+            <label htmlFor="role">Role:</label>
+            <select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="user">User</option>
+              <option value="manager">Manager</option>
+              <option value="admin">Admin</option>
+              <option value="reward">Reward</option>
+            </select>
+          </div>
           <button type="submit">Register</button>
         </form>
       </div>

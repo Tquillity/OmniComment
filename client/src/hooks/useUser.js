@@ -1,4 +1,4 @@
-// hooks/useUser.js
+// useUser.js
 import { useState, useEffect } from 'react';
 import { getUserInfo } from '../services/authServices';
 

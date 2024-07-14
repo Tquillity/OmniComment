@@ -1,4 +1,4 @@
-// Home.scss
+// _home.scss
 .home-container {
   display: flex;
   flex-direction: column;
@@ -24,6 +24,7 @@
   h2 {
     font-size: pxToRem(24);
     margin-bottom: pxToRem(16);
+    color: var(--accentuate-color);
   }
 
   p {

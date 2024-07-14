@@ -13,7 +13,7 @@ const TopicForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(title, subject); // Pass title and subject separately
+    onSubmit(title, subject);
     setFormData({ title: '', subject: '' });
   };
 

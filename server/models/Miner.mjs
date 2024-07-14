@@ -1,3 +1,4 @@
+// Miner.mjs
 import Transaction from './Transaction.mjs';
 
 export default class Miner {

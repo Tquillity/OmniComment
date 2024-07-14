@@ -1,3 +1,4 @@
+// server.mjs
 import express from 'express';
 import dotenv from 'dotenv';
 import { connectDb } from './config/mongo.mjs';
@@ -23,13 +24,11 @@ import { errorHandler } from './middleware/errorHandler.mjs';
 import commentRouter from './routes/comments-routes.mjs';
 import usersRouter from './routes/user-routes.mjs';
 
-// Load environment variables from config.env
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 global.__appdir = __dirname;
 dotenv.config({ path: path.join(__dirname, 'config', 'config.env')});
 
-// Connect to MongoDB
 connectDb();
 
 const credentials = {
@@ -39,7 +38,6 @@ const credentials = {
   userId: process.env.USER_ID,
 };
 
-// Create an instance of Blockchain
 export const blockchain = new Blockchain();
 export const transactionPool = new TransactionPool();
 export const wallet = new Wallet();
@@ -85,10 +83,9 @@ app.use((req, res, next) => {
 // Data sanitization against XSS
 app.use(xss());
 
-// Limit request during a specific time frame
 const limit = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: 10 * 60 * 1000,
+  max: 1000,
 });
 
 app.use(limit);
@@ -114,7 +111,6 @@ app.get('/api-docs.html', (req, res) => {
   res.sendFile(path.join(__appdir, 'public', 'api-docs.html'));
 });
 
-// Default port for the server and Root node URL
 const DEFAULT_PORT = 5001;
 const ROOT_NODE = `http://localhost:${DEFAULT_PORT}`;
 
@@ -129,13 +125,11 @@ app.use('/api/v1/blockchain', blockchainRouter);
 app.use('/api/v1/block', blockRouter);
 app.use('/api/v1/wallet', transactionRouter);
 
-// Function to synchronize the blockchain with the root node
 const synchronize = async () => {
-  // fetch the current blockchain from the root node
   let response = await fetch(`${ROOT_NODE}/api/v1/blockchain`);
   if (response.ok) {
     const result = await response.json();
-    blockchain.replaceChain(result.data); // Replace the current chain with the fetched chain
+    blockchain.replaceChain(result.data);
   }
 
   response = await fetch(`${ROOT_NODE}/api/v1/wallet/transactions`);
@@ -145,28 +139,34 @@ const synchronize = async () => {
   }
 };
 
-// Generate a dynamic port if the environment variable is set
 if (process.env.GENERATE_NODE_PORT === 'true') {
   NODE_PORT = DEFAULT_PORT + Math.ceil(Math.random() * 1000);
 }
-// Error handling middleware at the end to happen last
 app.use(errorHandler);
 
-// Set the port to either the dynamically generated port or the default port
 const PORT = NODE_PORT || DEFAULT_PORT;
 
-// Start the Express server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port: ${PORT}`.green.bgBlack);
+const startServer = async () => {
+  try {
+    await blockchain.initializeChain();
 
-  // If the port is not the default port, synchronize the blockchain
-  if (PORT !== DEFAULT_PORT) {
-    synchronize();
+    const server = app.listen(PORT, () => {
+    console.log(`Server running on port: ${PORT}`.green.bgBlack);
+
+    if (PORT !== DEFAULT_PORT) {
+      synchronize();
+    }
+  });
+
+  process.on('unhandledRejection', (err, promise) => {
+    console.log(`Error: ${err.message}`.red);
+    server.close(() => process.exit(1));
+  });
+  
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
   }
-});
+};
 
-// Handle unhandled rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log(`Error: ${err.message}`.red);
-  server.close(() => process.exit(1));
-});
+startServer();

@@ -11,6 +11,7 @@ $light-card-color: grey;
 $light-font-color: black;
 $light-error-color: #ff6b6b;
 $light-success-color: #51cf66;
+$light-accentuate-color: #f39c12;
 
 // Dark theme colors
 $dark-background-color: black;
@@ -23,6 +24,7 @@ $dark-card-color: grey;
 $dark-font-color: white;
 $dark-error-color: #ff8787;
 $dark-success-color: #69db7c;
+$dark-accentuate-color: #f39c12;
 
 // CSS variables defined 
 :root {
@@ -36,6 +38,7 @@ $dark-success-color: #69db7c;
   --font-color: #{$light-font-color};
   --error-color: #{$light-error-color};
   --success-color: #{$light-success-color};
+  --accentuate-color: #{$light-accentuate-color};
 }
 
 [data-theme='dark'] {
@@ -49,4 +52,5 @@ $dark-success-color: #69db7c;
   --font-color: #{$dark-font-color};
   --error-color: #{$dark-error-color};
   --success-color: #{$dark-success-color};
+  --accentuate-color: #{$dark-accentuate-color};
 }

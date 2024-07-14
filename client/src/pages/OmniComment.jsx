@@ -1,185 +1,124 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import TopicForm from '../components/omnicomment/TopicForm';
-import CommentForm from '../components/omnicomment/CommentForm';
-import TopicListItem from '../components/omnicomment/TopicListItem';
-import CommentListItem from '../components/omnicomment/CommentListItem';
-import { formatDate } from '../utilities/dateUtils';
+// OmniComment.jsx
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import TopicForm from "../components/omnicomment/TopicForm";
+import CommentForm from "../components/omnicomment/CommentForm";
+import TopicListItem from "../components/omnicomment/TopicListItem";
+import CommentListItem from "../components/omnicomment/CommentListItem";
+import { formatDate } from "../utilities/dateUtils";
+import { asyncHandler, handleAsyncAction } from "../utilities/asyncUtils";
 
 const OmniComment = ({ auth }) => {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
-  const [userName, setUserName] = useState('');
-  const [view, setView] = useState('list');
+  const [userName, setUserName] = useState("");
+  const [view, setView] = useState("list");
 
   useEffect(() => {
     fetchTopics();
     fetchUser();
   }, []);
 
-  const fetchTopics = async () => {
-    try {
-      const res = await axios.get('http://localhost:5001/api/v1/comments');
-      setTopics(res.data.data);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to fetch topics');
-    }
-  };
+  const fetchTopics = asyncHandler(async () => {
+    const res = await axios.get("http://localhost:5001/api/v1/comments");
+    if (res.error)
+      throw new Error(res.error.message || "Failed to fetch topics");
+    setTopics(res.data.data);
+  });
 
-  const fetchUser = async () => {
-    const token = localStorage.getItem('token');
+  const fetchUser = asyncHandler(async () => {
+    const token = localStorage.getItem("token");
     if (token) {
-      try {
-        const res = await axios.get('http://localhost:5001/api/v1/auth/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUserName(res.data.data.username);
-      } catch (err) {
-        console.error(err);
-        alert('Failed to fetch user information');
-      }
+      const res = await axios.get("http://localhost:5001/api/v1/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.error)
+        throw new Error(
+          res.error.message || "Failed to fetch user information"
+        );
+      setUserName(res.data.data.username);
     }
-  };
+  });
 
-  const onSubmitTopic = async (title, subject) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please login to create a topic');
-      return;
-    }
-    try {
-      await axios.post(
-        'http://localhost:5001/api/v1/wallet/transaction',
-        {
-          amount: 20,
-          recipient: 'forum-system',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      const res = await axios.post(
-        'http://localhost:5001/api/v1/comments',
-        {
-          commentNumber: new Date().getTime(),
-          title,
-          subject,
-          userName,
-          sourceAddress: 'forum',
-          commentVibes: 'neutral',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      setTopics([...topics, res.data.data]);
-      alert('Topic created successfully');
-    } catch (err) {
-      console.error(err.response ? err.response.data : err.message);
-      alert('Failed to create topic');
-    }
-  };
+  const onSubmitTopic = asyncHandler(async (title, subject) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login to create a topic");
 
-  const onSubmitComment = async (commentText) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please login to post a comment');
-      return;
-    }
-    try {
-      await axios.post(
-        'http://localhost:5001/api/v1/wallet/transaction',
-        {
-          amount: 10,
-          recipient: 'forum-system',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      const res = await axios.post(
-        'http://localhost:5001/api/v1/comments',
-        {
-          commentNumber: new Date().getTime(),
-          title: `${selectedTopic.title}.${new Date().getTime()}`,
-          parentTopic: selectedTopic.title,
-          subject: commentText,
-          userName,
-          sourceAddress: selectedTopic.sourceAddress,
-          commentVibes: 'neutral',
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-  
-      fetchTopics();
-      alert('Comment submitted successfully');
-    } catch (err) {
-      console.error(err.response ? err.response.data : err.message);
-      alert('Failed to submit comment');
-    }
-  };
+    const res = await axios.post(
+      "http://localhost:5001/api/v1/comments",
+      {
+        commentNumber: new Date().getTime(),
+        title,
+        subject,
+        userName,
+        sourceAddress: "forum",
+        commentVibes: "neutral",
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const handleVote = async (id, voteType) => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('Please login to vote');
-      return;
-    }
-    try {
-      const newVibe = voteType === 'up' ? 'positive' : 'negative';
-      await axios.put(
-        `http://localhost:5001/api/v1/comments/${id}`,
-        { commentVibes: newVibe },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      fetchTopics();
-    } catch (err) {
-      console.error(err.response ? err.response.data : err.message);
-      alert('Failed to vote');
-    }
-  };
+    if (res.error)
+      throw new Error(res.error.message || "Failed to create topic");
+    setTopics([...topics, res.data.data]);
+    return "Topic created successfully";
+  });
 
-  const getCommentCount = (topic) => {
-    return topic.comments ? topic.comments.length : 0;
-  };
+  const onSubmitComment = asyncHandler(async (commentText) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login to post a comment");
 
-  const getMainTopics = () => {
-    return topics.filter(topic => topic.isMainTopic);
-  };
+    const res = await axios.post(
+      "http://localhost:5001/api/v1/comments",
+      {
+        commentNumber: new Date().getTime(),
+        title: `${selectedTopic.title}.${new Date().getTime()}`,
+        parentTopic: selectedTopic.title,
+        subject: commentText,
+        userName,
+        sourceAddress: selectedTopic.sourceAddress,
+        commentVibes: "neutral",
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-  const getComments = () => {
-    return selectedTopic?.comments || [];
-  };
+    if (res.error)
+      throw new Error(res.error.message || "Failed to submit comment");
+    await fetchTopics();
+    return "Comment submitted successfully";
+  });
+
+  const handleVote = asyncHandler(async (id, voteType) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Please login to vote");
+
+    const newVibe = voteType === "up" ? "positive" : "negative";
+    const res = await axios.put(
+      `http://localhost:5001/api/v1/comments/${id}`,
+      { commentVibes: newVibe },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (res.error) throw new Error(res.error.message || "Failed to vote");
+    await fetchTopics();
+  });
+
+  const getMainTopics = () => topics.filter((topic) => topic.isMainTopic);
+
+  const getComments = () => selectedTopic?.comments || [];
 
   return (
     <div className="forum-container">
       <h1>Forum</h1>
 
-      {view === 'list' && (
+      {view === "list" && (
         <>
           <div className="create-topic">
             <h2>Create a New Topic</h2>
-            <TopicForm onSubmit={onSubmitTopic} />
+            <TopicForm
+              onSubmit={(title, subject) =>
+                handleAsyncAction(() => onSubmitTopic(title, subject))
+              }
+            />
           </div>
 
           <div className="topics-list">
@@ -189,8 +128,13 @@ const OmniComment = ({ auth }) => {
                 <TopicListItem
                   key={topic._id}
                   topic={topic}
-                  onClick={() => { setSelectedTopic(topic); setView('detail'); }}
-                  onVote={handleVote}
+                  onClick={() => {
+                    setSelectedTopic(topic);
+                    setView("detail");
+                  }}
+                  onVote={(id, voteType) =>
+                    handleAsyncAction(() => handleVote(id, voteType))
+                  }
                 />
               ))}
             </ul>
@@ -198,27 +142,52 @@ const OmniComment = ({ auth }) => {
         </>
       )}
 
-      {view === 'detail' && selectedTopic && (
+      {view === "detail" && selectedTopic && (
         <div className="selected-topic">
-          <button className="back-button" onClick={() => setView('list')}>Back to List</button>
+          <button className="back-button" onClick={() => setView("list")}>
+            Back to List
+          </button>
           <h2>{selectedTopic.title}</h2>
           <p className="topic-meta">
-            Posted by {selectedTopic.userName} on {formatDate(selectedTopic.createdAt)}
+            Posted by {selectedTopic.userName} on{" "}
+            {formatDate(selectedTopic.createdAt)}
           </p>
           <p>{selectedTopic.subject}</p>
           <div className="vote-buttons">
-            <button onClick={() => handleVote(selectedTopic._id, 'up')}>👍</button>
+            <button
+              onClick={() =>
+                handleAsyncAction(() => handleVote(selectedTopic._id, "up"))
+              }
+            >
+              👍
+            </button>
             <span>{selectedTopic.commentVibes}</span>
-            <button onClick={() => handleVote(selectedTopic._id, 'down')}>👎</button>
+            <button
+              onClick={() =>
+                handleAsyncAction(() => handleVote(selectedTopic._id, "down"))
+              }
+            >
+              👎
+            </button>
           </div>
           <h3>Comments</h3>
           <ul className="comments-list">
             {getComments().map((comment) => (
-              <CommentListItem key={comment._id} comment={comment} onVote={handleVote} />
+              <CommentListItem
+                key={comment._id}
+                comment={comment}
+                onVote={(id, voteType) =>
+                  handleAsyncAction(() => handleVote(id, voteType))
+                }
+              />
             ))}
           </ul>
 
-          <CommentForm onSubmit={onSubmitComment} />
+          <CommentForm
+            onSubmit={(commentText) =>
+              handleAsyncAction(() => onSubmitComment(commentText))
+            }
+          />
         </div>
       )}
     </div>
